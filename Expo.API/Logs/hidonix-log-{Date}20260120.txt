@@ -1,0 +1,45 @@
+2026-01-20 06:54:44.259 +01:00 [INF] Start installing Hangfire SQL objects...
+2026-01-20 06:54:44.303 +01:00 [INF] Hangfire SQL objects installed.
+2026-01-20 06:54:44.567 +01:00 [INF] Now listening on: https://localhost:7094
+2026-01-20 06:54:44.570 +01:00 [INF] Now listening on: https://[::]:7094
+2026-01-20 06:54:44.572 +01:00 [INF] Now listening on: http://localhost:5266
+2026-01-20 06:54:44.573 +01:00 [INF] Now listening on: http://[::]:5266
+2026-01-20 06:54:44.671 +01:00 [INF] Starting Hangfire Server using job storage: 'PostgreSQL Server: Host: localhost, DB: HidoniExpo, Schema: hangfire'
+2026-01-20 06:54:44.675 +01:00 [INF] Using the following options for PostgreSQL job storage:
+2026-01-20 06:54:44.677 +01:00 [INF]     Queue poll interval: 00:00:15.
+2026-01-20 06:54:44.678 +01:00 [INF]     Invisibility timeout: 00:30:00.
+2026-01-20 06:54:44.679 +01:00 [INF]     Use sliding invisibility timeout: False.
+2026-01-20 06:54:44.681 +01:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2026-01-20 06:54:44.723 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-01-20 06:54:44.725 +01:00 [INF] Hosting environment: Development
+2026-01-20 06:54:44.728 +01:00 [INF] Content root path: C:\Repo\Jack\Altro\PersonalApp\Hidonix.Expo\Hidonix.Expo.API
+2026-01-20 06:54:44.921 +01:00 [INF] Server px0003008705-46:39600:4c4918fc successfully announced in 174,4009 ms
+2026-01-20 06:54:44.929 +01:00 [INF] Server px0003008705-46:39600:4c4918fc is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2026-01-20 06:54:44.945 +01:00 [INF] 1 servers were removed due to timeout
+2026-01-20 06:54:45.016 +01:00 [INF] Server px0003008705-46:39600:4c4918fc all the dispatchers started
+2026-01-20 06:54:45.207 +01:00 [INF] Removed 1 outdated record(s) from 'aggregatedcounter' table.
+2026-01-20 06:54:46.083 +01:00 [INF] HTTP GET /swagger/index.html responded 200 in 47.3567 ms
+2026-01-20 06:54:46.415 +01:00 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 55.0825 ms
+2026-01-20 06:55:51.147 +01:00 [INF] HTTP GET /api/v1/User responded 401 in 5252.7136 ms
+2026-01-20 06:56:37.490 +01:00 [INF] HTTP POST /api/v1/Authentication/register responded 400 in 123.8733 ms
+2026-01-20 06:56:49.345 +01:00 [INF] HTTP POST /api/v1/Authentication/register responded 400 in 60.1687 ms
+2026-01-20 06:57:12.908 +01:00 [INF] HTTP POST /api/v1/Authentication/register responded 400 in 16.1024 ms
+2026-01-20 06:58:08.372 +01:00 [INF] HTTP POST /api/v1/Authentication/register responded 400 in 44776.4798 ms
+2026-01-20 06:58:16.793 +01:00 [INF] HTTP POST /api/v1/Authentication/register responded 200 in 1590.2492 ms
+2026-01-20 06:58:19.043 +01:00 [INF] HTTP GET /api/v1/authentication/confirm-email responded 200 in 39.3011 ms
+2026-01-20 06:58:19.227 +01:00 [INF] HTTP GET /favicon.ico responded 404 in 21.3632 ms
+2026-01-20 06:58:44.179 +01:00 [INF] Attempting login for user: gigio@gigio.it
+2026-01-20 06:58:44.235 +01:00 [WRN] Failed
+2026-01-20 06:58:44.240 +01:00 [INF] HTTP POST /api/v1/Authentication/login responded 401 in 68.3559 ms
+2026-01-20 06:58:59.212 +01:00 [INF] Attempting login for user: gigio@gigio.it
+2026-01-20 06:58:59.385 +01:00 [INF] User logged in successfully: gigio@gigio.it
+2026-01-20 06:58:59.391 +01:00 [INF] HTTP POST /api/v1/Authentication/login responded 200 in 180.1392 ms
+2026-01-20 06:59:49.616 +01:00 [INF] Fetching all categorie
+2026-01-20 06:59:49.655 +01:00 [INF] HTTP GET /api/v1/Categoria responded 200 in 75.1928 ms
+2026-01-20 07:00:03.603 +01:00 [INF] Fetching all result
+2026-01-20 07:00:03.701 +01:00 [INF] Retrieved 4 results
+2026-01-20 07:00:03.704 +01:00 [INF] HTTP GET /api/v1/User responded 200 in 108.3695 ms

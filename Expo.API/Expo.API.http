@@ -1,0 +1,6 @@
+@Expo.API_HostAddress = http://localhost:5075
+
+GET {{Expo.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

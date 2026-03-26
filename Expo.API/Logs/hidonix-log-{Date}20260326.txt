@@ -1,0 +1,83 @@
+2026-03-26 14:18:30.479 +01:00 [ERR] An error occurred using the connection to database 'Expo' on server 'tcp://localhost:5432'.
+2026-03-26 14:18:32.932 +01:00 [INF] Start installing Hangfire SQL objects...
+2026-03-26 14:18:33.553 +01:00 [INF] Hangfire SQL objects installed.
+2026-03-26 14:18:33.761 +01:00 [INF] Now listening on: https://localhost:7094
+2026-03-26 14:18:33.763 +01:00 [INF] Now listening on: https://[::]:7094
+2026-03-26 14:18:33.765 +01:00 [INF] Now listening on: http://localhost:5266
+2026-03-26 14:18:33.766 +01:00 [INF] Now listening on: http://[::]:5266
+2026-03-26 14:18:33.837 +01:00 [INF] Starting Hangfire Server using job storage: 'PostgreSQL Server: Host: localhost, DB: Expo, Schema: hangfire'
+2026-03-26 14:18:33.839 +01:00 [INF] Using the following options for PostgreSQL job storage:
+2026-03-26 14:18:33.840 +01:00 [INF]     Queue poll interval: 00:00:15.
+2026-03-26 14:18:33.841 +01:00 [INF]     Invisibility timeout: 00:30:00.
+2026-03-26 14:18:33.842 +01:00 [INF]     Use sliding invisibility timeout: False.
+2026-03-26 14:18:33.843 +01:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2026-03-26 14:18:33.888 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-03-26 14:18:33.890 +01:00 [INF] Hosting environment: Development
+2026-03-26 14:18:33.891 +01:00 [INF] Content root path: C:\Repo\Jack\Altro\PersonalApp\Hidonix.Expo\Hidonix.Expo.API
+2026-03-26 14:18:34.036 +01:00 [INF] Server px0003008705-46:21280:d5ffd368 successfully announced in 148,0124 ms
+2026-03-26 14:18:34.041 +01:00 [INF] Server px0003008705-46:21280:d5ffd368 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2026-03-26 14:18:34.122 +01:00 [INF] Server px0003008705-46:21280:d5ffd368 all the dispatchers started
+2026-03-26 14:18:34.880 +01:00 [INF] HTTP GET /swagger responded 301 in 3.2865 ms
+2026-03-26 14:18:34.943 +01:00 [INF] HTTP GET /swagger/index.html responded 200 in 44.2435 ms
+2026-03-26 14:18:35.070 +01:00 [INF] HTTP GET /swagger/swagger-ui-standalone-preset.js responded 200 in 53.4274 ms
+2026-03-26 14:18:35.070 +01:00 [INF] HTTP GET /swagger/swagger-ui.css responded 200 in 55.1879 ms
+2026-03-26 14:18:35.085 +01:00 [INF] HTTP GET /swagger/swagger-ui-bundle.js responded 200 in 68.1551 ms
+2026-03-26 14:18:35.266 +01:00 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 44.6391 ms
+2026-03-26 15:46:44.432 +01:00 [ERR] Failed executing DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE "AspNetRoles" (
+    "Id" text NOT NULL,
+    "Name" character varying(256),
+    "NormalizedName" character varying(256),
+    "ConcurrencyStamp" text,
+    CONSTRAINT "PK_AspNetRoles" PRIMARY KEY ("Id")
+);
+2026-03-26 15:49:39.065 +01:00 [ERR] An error occurred using the connection to database 'Expo' on server 'tcp://localhost:5432'.
+2026-03-26 15:49:41.356 +01:00 [INF] Start installing Hangfire SQL objects...
+2026-03-26 15:49:42.041 +01:00 [INF] Hangfire SQL objects installed.
+2026-03-26 15:49:42.121 +01:00 [WRN] The WebRootPath was not found: C:\Repo\Jack\Altro\PersonalApp\ExpoManager\Expo.API\wwwroot. Static files may be unavailable.
+2026-03-26 15:49:42.259 +01:00 [INF] Now listening on: https://localhost:7017
+2026-03-26 15:49:42.264 +01:00 [INF] Now listening on: http://localhost:5075
+2026-03-26 15:49:42.356 +01:00 [INF] Starting Hangfire Server using job storage: 'PostgreSQL Server: Host: localhost, DB: Expo, Schema: hangfire'
+2026-03-26 15:49:42.358 +01:00 [INF] Using the following options for PostgreSQL job storage:
+2026-03-26 15:49:42.367 +01:00 [INF]     Queue poll interval: 00:00:15.
+2026-03-26 15:49:42.369 +01:00 [INF]     Invisibility timeout: 00:30:00.
+2026-03-26 15:51:06.287 +01:00 [INF] Start installing Hangfire SQL objects...
+2026-03-26 15:51:06.321 +01:00 [INF] Hangfire SQL objects installed.
+2026-03-26 15:51:06.385 +01:00 [WRN] The WebRootPath was not found: C:\Repo\Jack\Altro\PersonalApp\ExpoManager\Expo.API\wwwroot. Static files may be unavailable.
+2026-03-26 15:51:06.488 +01:00 [INF] Now listening on: https://localhost:7017
+2026-03-26 15:51:06.490 +01:00 [INF] Now listening on: http://localhost:5075
+2026-03-26 15:51:06.557 +01:00 [INF] Starting Hangfire Server using job storage: 'PostgreSQL Server: Host: localhost, DB: Expo, Schema: hangfire'
+2026-03-26 15:51:06.563 +01:00 [INF] Using the following options for PostgreSQL job storage:
+2026-03-26 15:51:06.567 +01:00 [INF]     Queue poll interval: 00:00:15.
+2026-03-26 15:53:27.704 +01:00 [INF] Start installing Hangfire SQL objects...
+2026-03-26 15:53:27.741 +01:00 [INF] Hangfire SQL objects installed.
+2026-03-26 15:53:27.807 +01:00 [WRN] The WebRootPath was not found: C:\Repo\Jack\Altro\PersonalApp\ExpoManager\Expo.API\wwwroot. Static files may be unavailable.
+2026-03-26 15:53:27.916 +01:00 [INF] Now listening on: https://localhost:7017
+2026-03-26 15:53:27.919 +01:00 [INF] Now listening on: http://localhost:5075
+2026-03-26 15:53:27.984 +01:00 [INF] Starting Hangfire Server using job storage: 'PostgreSQL Server: Host: localhost, DB: Expo, Schema: hangfire'
+2026-03-26 15:53:27.992 +01:00 [INF] Using the following options for PostgreSQL job storage:
+2026-03-26 15:53:27.994 +01:00 [INF]     Queue poll interval: 00:00:15.
+2026-03-26 15:53:27.995 +01:00 [INF]     Invisibility timeout: 00:30:00.
+2026-03-26 15:53:27.997 +01:00 [INF]     Use sliding invisibility timeout: False.
+2026-03-26 15:53:27.998 +01:00 [INF] Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+2026-03-26 15:53:28.029 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-03-26 15:53:28.032 +01:00 [INF] Hosting environment: Development
+2026-03-26 15:53:28.048 +01:00 [INF] Content root path: C:\Repo\Jack\Altro\PersonalApp\ExpoManager\Expo.API
+2026-03-26 15:53:28.139 +01:00 [INF] Server px0003008705-46:18752:dada8539 successfully announced in 109,6792 ms
+2026-03-26 15:53:28.144 +01:00 [INF] Server px0003008705-46:18752:dada8539 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, Worker, DelayedJobScheduler, RecurringJobScheduler...
+2026-03-26 15:53:28.233 +01:00 [INF] Server px0003008705-46:18752:dada8539 all the dispatchers started
+2026-03-26 15:53:29.159 +01:00 [INF] HTTP GET /swagger responded 301 in 4.9247 ms
+2026-03-26 15:53:29.248 +01:00 [INF] HTTP GET /swagger/index.html responded 200 in 67.2849 ms
+2026-03-26 15:53:29.385 +01:00 [INF] HTTP GET /swagger/swagger-ui-standalone-preset.js responded 200 in 60.6272 ms
+2026-03-26 15:53:29.385 +01:00 [INF] HTTP GET /swagger/swagger-ui.css responded 200 in 60.6367 ms
+2026-03-26 15:53:29.403 +01:00 [INF] HTTP GET /swagger/swagger-ui-bundle.js responded 200 in 78.7987 ms
+2026-03-26 15:53:29.570 +01:00 [INF] HTTP GET /swagger/favicon-32x32.png responded 200 in 0.2956 ms
+2026-03-26 15:53:29.602 +01:00 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 44.0898 ms
