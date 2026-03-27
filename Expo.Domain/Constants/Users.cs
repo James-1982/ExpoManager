@@ -13,7 +13,7 @@ public static class Users
         /// <summary>
         /// Email
         /// </summary>
-        public const string Email = "admin@hidonix.com";
+        public const string Email = "admin@expo.com";
         /// <summary>
         /// Password
         /// </summary>
