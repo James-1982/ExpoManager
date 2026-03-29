@@ -1,32 +1,50 @@
-﻿namespace Expo.Domain.Entities;
+﻿using Expo.Domain.ValuiesObject;
+
+namespace Expo.Domain.Entities;
 
 /// <summary>
-/// Entity Stand
+/// Stand entity associated with a pavilion and an exhibition area
 /// </summary>
 public class Stand : BaseEntity
 {
-    /// <summary>
-    /// Dimension
-    /// </summary>
-    public string? Dimensioni { get; set; }
+    public Dimensions Dimensions { get; private set; }
 
-    /// <summary>
-    /// Id of associated Padiglione
-    /// </summary>
-    public int? PadiglioneId { get; set; }
+    // Foreign keys
+    public int PavilionId { get; private set; }
+    public int ExhibitionAreaId { get; private set; }
 
-    /// <summary>
-    /// Associated Padiglione
-    /// </summary>
-    public Pavilion? Padiglione { get; set; }
+    // Navigation properties
+    public Pavilion Pavilion { get; private set; }
+    public ExhibitionArea ExhibitionArea { get; private set; }
 
-    /// <summary>
-    /// Id of associated Settore
-    /// </summary>
-    public int? SettoreId { get; set; }
+    public Stand() : base()
+    { }
 
-    /// <summary>
-    /// Associated Settore
-    /// </summary>
-    public ExhibitionHall? Settore { get; set; }
+    public Stand(string name, Dimensions dimensions, Pavilion pavilion, ExhibitionArea exhibitionArea)
+        : base(name)
+    {
+        Dimensions = dimensions;
+        Pavilion = pavilion ?? throw new ArgumentNullException(nameof(pavilion));
+        PavilionId = pavilion.Id;
+
+        ExhibitionArea = exhibitionArea ?? throw new ArgumentNullException(nameof(exhibitionArea));
+        ExhibitionAreaId = exhibitionArea.Id;
+    }
+
+    public void ChangePavilion(Pavilion newPavilion)
+    {
+        Pavilion = newPavilion ?? throw new ArgumentNullException(nameof(newPavilion));
+        PavilionId = newPavilion.Id;
+    }
+
+    public void ChangeExhibitionArea(ExhibitionArea newArea)
+    {
+        ExhibitionArea = newArea ?? throw new ArgumentNullException(nameof(newArea));
+        ExhibitionAreaId = newArea.Id;
+    }
+
+    public void UpdateDimensions(Dimensions newDimensions)
+    {
+        Dimensions = newDimensions ?? throw new ArgumentNullException(nameof(newDimensions));
+    }
 }

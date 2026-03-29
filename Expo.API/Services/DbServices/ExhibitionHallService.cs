@@ -1,266 +1,189 @@
-﻿using Expo.Domain.DTO.DB;
-using Expo.Domain.Entities;
-using Expo.Domain.Interfaces.Repo;
-using Expo.Domain.Interfaces.Services;
-using FluentResults;
+﻿using FluentResults;
 using Hangfire;
+using Expo.Domain.DTO.DB;
+using Expo.Domain.Entities;
 using MapsterMapper;
+using Expo.Application.Interfaces.Services;
+using Expo.Domain.Interfaces.Repositories;
 
 namespace Expo.API.Services.DbServices;
 
 /// <summary>
-/// Service to manage Settore
+/// Service to manage Exhibition Halls (Sectors)
 /// </summary>
-/// <param name="logger">Logger for diagnostic purposes.</param>
-/// <param name="mapper">Mapper used for object-to-object mapping.</param>
-/// <param name="imageService">Service used to manage image processing and storage.</param>
-/// <param name="backgroundJobClient">Background job scheduler used to run async tasks.</param>
-/// <param name="uow">Unit of Work for transactional persistence.</param>
-/// <remarks>
-/// This constructor injects all required services for category operations.
-/// </remarks>
 internal class ExhibitionHallService(
     ILogger<ExhibitionHallService> logger,
     IMapper mapper,
     IImageService imageService,
     IBackgroundJobClient backgroundJobClient,
-    IUnitOfWork uow) : IExhibitionHallService
+    IUnitOfWork uow) : IExhibitionAreaService
 {
-    #region Fields
-
     private readonly ILogger<ExhibitionHallService> _logger = logger;
     private readonly IImageService _imageService = imageService;
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _uow = uow;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
-    #endregion
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="baseUrl"></param>
-    /// <returns></returns>
-    public async Task<Result<IList<ExhibitionHallOutDto>>> GetAllAsync(string baseUrl)
+    public async Task<Result<IList<ExhibitionAreaOutDto>>> GetAllAsync(string baseUrl)
     {
         _logger.LogInformation("Fetching all sectors");
 
         var entities = await _uow.ExhibitionHalls.GetAllWithStandsAsync();
-
         if (entities == null || !entities.Any())
-        {
-            var msg = "No data found";
-            _logger.LogInformation(msg);
-            return Result.Fail(msg);
-        }
+            return Result.Fail<IList<ExhibitionAreaOutDto>>("No data found");
 
         var dtos = _mapper.From(entities)
-                  .AddParameters("BaseUrl", baseUrl)
-                  .AdaptToType<List<ExhibitionHallOutDto>>();
+                          .AddParameters("BaseUrl", baseUrl)
+                          .AdaptToType<List<ExhibitionAreaOutDto>>();
 
-        return Result.Ok<IList<ExhibitionHallOutDto>>(dtos);
+        return Result.Ok<IList<ExhibitionAreaOutDto>>(dtos);
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="baseUrl"></param>
-    /// <returns></returns>
-    public async Task<Result<ExhibitionHallOutDto>> GetByIdAsync(int id, string baseUrl)
+
+    public async Task<Result<ExhibitionAreaOutDto>> GetByIdAsync(int id, string baseUrl)
     {
         var entity = await _uow.ExhibitionHalls.GetWithStandsAsync(id);
-
         if (entity == null)
         {
-            var msg = $"Data with {id} not found";
-            _logger.LogInformation(msg);
-            return Result.Fail(msg);
+            _logger.LogInformation($"Sector {id} not found");
+            return Result.Fail<ExhibitionAreaOutDto>($"Sector {id} not found");
         }
 
         var dto = _mapper.From(entity)
-                 .AddParameters("BaseUrl", baseUrl)
-                 .AdaptToType<ExhibitionHallOutDto>();
+                         .AddParameters("BaseUrl", baseUrl)
+                         .AdaptToType<ExhibitionAreaOutDto>();
 
         return Result.Ok(dto);
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="dto"></param>
-    /// <param name="baseUrl"></param>
-    /// <returns></returns>
-    public async Task<Result<ExhibitionHallOutDto>> CreateAsync(ExhibitionHallInDto dto, string baseUrl)
+
+    public async Task<Result<ExhibitionAreaOutDto>> CreateAsync(ExhibitionAreaInDto dto, string baseUrl)
     {
         try
         {
-            var entity = _mapper.Map<ExhibitionHall>(dto);
-
+            var entity = _mapper.Map<ExhibitionArea>(dto);
             await _uow.ExhibitionHalls.AddAsync(entity);
-
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
-             .AddParameters("BaseUrl", baseUrl)
-             .AdaptToType<ExhibitionHallOutDto>();
+                                .AddParameters("BaseUrl", baseUrl)
+                                .AdaptToType<ExhibitionAreaOutDto>();
 
             return Result.Ok(outDto);
         }
         catch (Exception ex)
         {
-            return Result.Fail(ex.Message);
+            return Result.Fail<ExhibitionAreaOutDto>(ex.Message);
         }
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="dto"></param>
-    /// <param name="baseUrl"></param>
-    /// <returns></returns>
-    public async Task<Result<ExhibitionHallOutDto>> UpdateAsync(int id, ExhibitionHallInDto dto, string baseUrl)
+
+    public async Task<Result<ExhibitionAreaOutDto>> UpdateAsync(int id, ExhibitionAreaInDto dto, string baseUrl)
     {
         try
         {
             var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
-
             if (entity == null)
             {
-                var msg = $"Entity {id} not found";
+                var msg = $"Sector {id} not found";
                 _logger.LogWarning(msg);
-                return Result.Fail(msg);
+                return Result.Fail<ExhibitionAreaOutDto>(msg);
             }
 
-            _mapper.Map(dto, entity); // Update existing entity with new data
-
+            _mapper.Map(dto, entity);
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
-             .AddParameters("BaseUrl", baseUrl)
-             .AdaptToType<ExhibitionHallOutDto>();
+                                .AddParameters("BaseUrl", baseUrl)
+                                .AdaptToType<ExhibitionAreaOutDto>();
 
             return Result.Ok(outDto);
         }
         catch (Exception ex)
         {
-            return Result.Fail(ex.Message);
+            return Result.Fail<ExhibitionAreaOutDto>(ex.Message);
         }
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+
     public async Task DeleteAsync(int id)
     {
         _backgroundJobClient.Enqueue(() => DeleteJob(id));
-
         _logger.LogInformation($"Scheduled deletion for sector {id}");
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+
     public async Task DeleteJob(int id)
     {
         var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
-
         if (entity == null)
             return;
 
-        _uow.ExhibitionHalls.Remove(entity);
+        var imagePath = entity.ImagePath; // salva il path prima della cancellazione
 
+        _uow.ExhibitionHalls.Remove(entity);
         await _uow.SaveAsync();
 
-        entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
-
-        if (entity == null)
+        if (!string.IsNullOrEmpty(imagePath))
         {
-            if (!string.IsNullOrEmpty(entity.ImmaginePath))
-            {
-                _logger.LogInformation($"Deleting image for sector {id} in background job");
-                _imageService.DeleteImage(entity.ImmaginePath);
-            }
-
-            _logger.LogInformation($"Sector {id} deleted in background job");
+            _logger.LogInformation($"Deleting image for sector {id} in background job");
+            await _imageService.DeleteImageAsync(imagePath);
         }
-        else
-            _logger.LogError($"Error while deleting sector {id}");
+
+        _logger.LogInformation($"Sector {id} deleted in background job");
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="imageStream"></param>
-    /// <param name="fileName"></param>
-    /// <param name="baseUrl"></param>
-    /// <returns></returns>
+
     public async Task<Result<string>> UploadImageAsync(int id, Stream imageStream, string fileName, string baseUrl)
     {
         if (imageStream == null)
         {
             var msg = "Empty image";
             _logger.LogError(msg);
-            return Result.Fail(msg);
+            return Result.Fail<string>(msg);
         }
 
         var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
-
         if (entity == null)
         {
             var msg = $"Sector {id} not found";
             _logger.LogWarning(msg);
-            return Result.Fail(msg);
+            return Result.Fail<string>(msg);
         }
 
-        if (!string.IsNullOrEmpty(entity.ImmaginePath))
-            _imageService.DeleteImage(entity.ImmaginePath);
+        if (!string.IsNullOrEmpty(entity.ImagePath))
+            await _imageService.DeleteImageAsync(entity.ImagePath);
 
         var result = await _imageService.SaveImageAsync(
-            nameof(ExhibitionHall),
+            nameof(ExhibitionArea),
             imageStream,
             entity.Id.ToString(),
             Path.GetExtension(fileName));
 
-        entity.ImmaginePath = result.Value;
-
-        await _uow.SaveAsync();
-
         if (result.IsSuccess)
         {
-            var url = $"{baseUrl}/{_imageService.ImagesFolder}/{entity.ImmaginePath}";
+            entity.UpdateImmaginePath(result.Value);
+            await _uow.SaveAsync();
 
+            var url = $"{baseUrl}/{_imageService.ImagesFolder}/{entity.ImagePath}";
             _logger.LogInformation($"Image uploaded for sector {id}: {url}");
 
             return Result.Ok(url);
         }
 
-        return result;
+        return Result.Fail<string>(result.Errors.FirstOrDefault()?.Message ?? "Error saving image");
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+
     public async Task<Result<bool>> DeleteImageAsync(int id)
     {
         var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
-
         if (entity == null)
         {
             _logger.LogWarning($"Sector {id} not found");
-            return Result.Ok();
+            return Result.Ok(); 
         }
 
-        if (!string.IsNullOrEmpty(entity.ImmaginePath))
-            _imageService.DeleteImage(entity.ImmaginePath);
+        if (!string.IsNullOrEmpty(entity.ImagePath))
+            await _imageService.DeleteImageAsync(entity.ImagePath);
 
-        entity.ImmaginePath = null;
-
+        entity.UpdateImmaginePath(null);
         await _uow.SaveAsync();
 
         _logger.LogInformation($"Image deleted for sector {id}");
-
         return Result.Ok();
     }
 }

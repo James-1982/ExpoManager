@@ -7,17 +7,17 @@ public class FluentValidationFilter : IActionFilter
 {
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        if (context.Controller is not Controller)
+        if (!context.ModelState.IsValid)
         {
-            if (!context.ModelState.IsValid)
-            {
-                var firstError = context.ModelState
-                   .Where(ms => ms.Value?.Errors.Count > 0)
-                   .SelectMany(ms => ms.Value.Errors)
-                   .FirstOrDefault();
+            var firstError = context.ModelState
+               .Where(ms => ms.Value?.Errors.Count > 0)
+               .SelectMany(ms => ms.Value.Errors)
+               .FirstOrDefault();
 
-                context.Result = new JsonResult(firstError?.ErrorMessage) { StatusCode = 400 };
-            }
+            context.Result = new JsonResult(new { Error = firstError?.ErrorMessage })
+            {
+                StatusCode = 400
+            };
         }
     }
 

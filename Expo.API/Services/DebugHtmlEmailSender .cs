@@ -1,5 +1,5 @@
-﻿using Expo.Domain.DTO;
-using Expo.Domain.Interfaces.Services;
+﻿using Expo.Application.Interfaces.Services;
+using Expo.Domain.DTO;
 using FluentResults;
 using System.Net;
 
@@ -24,7 +24,6 @@ internal class DebugHtmlEmailSender : IAPIEmailSender
         if (File.Exists(_filePath))
             File.Delete(_filePath);
 
-        // Genera il contenuto HTML
         var content = $@"
             <div style='font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; text-align: center; margin: 40px;'>
                 <h2 style='font-size: 1.5em; margin-bottom: 20px;'>{WebUtility.HtmlEncode(email.Email)}</h2>
@@ -33,8 +32,8 @@ internal class DebugHtmlEmailSender : IAPIEmailSender
                 <hr style='margin-top: 30px; width: 80%;'/>
             </div>";
 
-        // Appendi al file esistente
-        File.AppendAllText(_filePath, content);
+        // Sovrascrivi il file invece di appenderlo
+        File.WriteAllText(_filePath, content);
 
         // Apri il file nel browser
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo

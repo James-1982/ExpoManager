@@ -11,62 +11,50 @@ using Expo.API.Extensions;
 using Expo.API.Middleware;
 using Expo.API.Middleware.Validations;
 using Expo.API.Utils;
-using Expo.Infrastructure.Data;
 using Expo.Infrastructure.Seeders;
-
+using Expo.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --------------------------------------------------
-// LOGGING & SERVICES
+// LOGGING
 // --------------------------------------------------
-
 builder.Host.UseSerilog();
 builder.Services.AddLogging(builder.Configuration);
+
+// --------------------------------------------------
+// AUTHENTICATION & INFRASTRUCTURE
+// --------------------------------------------------
 builder.Services.SetupAuthentication(builder.Configuration);
-builder.Services.SetupInfrastructure(builder.Configuration);
-builder.Services.AddExpoServices();
+builder.Services.SetupInfrastructure(builder.Configuration); // DbContext, Repositories, Services
+builder.Services.AddExpoServices(); // I tuoi servizi applicativi
 
 // --------------------------------------------------
-// DTO MAPPING
+// MAPSTER (DTO MAPPING)
 // --------------------------------------------------
-
-//builder.Services.AddAutoMapper(cfg => cfg.AddProfile<EntityProfile>());
-
-// ⬇ REGISTRA tutte le tue configurazioni Mapster
-MapsterConfig.RegisterMappings();
-
-// ⬇ Se vuoi usare IMapper con DI
+MapsterConfig.RegisterMappings(); // Configurazioni globali Mapster
 var config = TypeAdapterConfig.GlobalSettings;
 builder.Services.AddSingleton(config);
 builder.Services.AddScoped<IMapper, ServiceMapper>();
+
 // --------------------------------------------------
 // CONTROLLERS + VALIDATION
 // --------------------------------------------------
-
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<FluentValidationFilter>();
 })
 .AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.Converters.Add(
-        new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 
-builder.Services.AddValidators();
-
-builder.Services.AddFluentValidationAutoValidation(o =>
-{
-    o.DisableDataAnnotationsValidation = true;
-});
-
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddValidators(); // Aggiunge tutti i validator
+builder.Services.AddFluentValidationAutoValidation(o => o.DisableDataAnnotationsValidation = true);
 
 // --------------------------------------------------
 // API VERSIONING
 // --------------------------------------------------
-
 builder.Services
     .AddApiVersioning(options =>
     {
@@ -77,26 +65,22 @@ builder.Services
     .AddMvc()
     .AddApiExplorer(options =>
     {
-        options.GroupNameFormat = "'v'VVV";       // v1, v2, v3
+        options.GroupNameFormat = "'v'VVV"; // v1, v2, v3
         options.SubstituteApiVersionInUrl = true;
     });
 
 // --------------------------------------------------
 // SWAGGER
 // --------------------------------------------------
-
 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
 builder.Services.AddSwaggerGen(options =>
 {
-    // Include XML documentation
-    options.IncludeXmlComments(xmlPath);
-
-    // Add versioning support (populated by ConfigureSwaggerOptions)
+    options.IncludeXmlComments(xmlPath); // Documentazione XML
     options.OperationFilter<SwaggerDefaultValues>();
 
-    // JWT Bearer
+    // JWT Bearer Authorization
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Insert JWT token as 'Bearer {token}'",
@@ -125,14 +109,18 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 // --------------------------------------------------
-// APP
+// BUILD APP
 // --------------------------------------------------
-
 var app = builder.Build();
 
+// --------------------------------------------------
+// LOG REQUESTS
+// --------------------------------------------------
 app.UseSerilogRequestLogging();
 
-// DB Migration + seed
+// --------------------------------------------------
+// DATABASE MIGRATION + SEED
+// --------------------------------------------------
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -141,24 +129,21 @@ using (var scope = app.Services.CreateScope())
 }
 
 // --------------------------------------------------
-// SWAGGER UI
+// SWAGGER UI (solo dev)
 // --------------------------------------------------
-
 if (app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error500");
 
     app.UseSwagger();
-
     var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-
     app.UseSwaggerUI(options =>
     {
         foreach (var desc in provider.ApiVersionDescriptions)
         {
             options.SwaggerEndpoint(
                 $"/swagger/{desc.GroupName}/swagger.json",
-                $"{ApiConstants.APINAME} {desc.GroupName.ToUpperInvariant()}"
+                $"Expo API {desc.GroupName.ToUpperInvariant()}"
             );
         }
     });
@@ -167,7 +152,6 @@ if (app.Environment.IsDevelopment())
 // --------------------------------------------------
 // PIPELINE
 // --------------------------------------------------
-
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseHttpsRedirection();

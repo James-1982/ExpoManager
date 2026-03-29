@@ -1,12 +1,12 @@
 ﻿namespace Expo.Domain.DTO.User;
 
 /// <summary>
-/// DTO for email data
+/// DTO representing an email address for a user
 /// </summary>
 public class EmailDto
 {
     /// <summary>
-    /// The email
+    /// Email address of the user
     /// </summary>
     public string Email { get; set; } = default!;
 }

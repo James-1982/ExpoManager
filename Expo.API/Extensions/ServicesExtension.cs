@@ -1,11 +1,11 @@
 ﻿using Expo.API.Services;
 using Expo.API.Services.DbServices;
 using Expo.API.Utils;
+using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
-using Expo.Domain.Interfaces.Repo;
-using Expo.Domain.Interfaces.Services;
-using Expo.Infrastructure.Data;
-using Expo.Infrastructure.Repositories;
+using Expo.Domain.Interfaces.Repositories;
+using Expo.Infrastructure.Persistence;
+using Expo.Infrastructure.Persistence.Repositories;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -36,7 +36,7 @@ internal static class ServicesExtension
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPavilionRepository, PavilionRepository>();
-        services.AddScoped<IExhibitionHallRepository, ExhibitionHallRepository>();
+        services.AddScoped<IExhibitionAreaRepository, ExhibitionAreaRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IStandRepository, StandRepository>();
 
@@ -125,9 +125,9 @@ internal static class ServicesExtension
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
-        services.AddScoped<ICategoriaService, CategoryService>();
+        services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IPavilionService, PavilionService>();
-        services.AddScoped<IExhibitionHallService, ExhibitionHallService>();
+        services.AddScoped<IExhibitionAreaService, ExhibitionHallService>();
         services.AddScoped<IStandService, StandService>();
     }
     /// <summary>

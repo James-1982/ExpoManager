@@ -1,36 +1,85 @@
 ﻿namespace Expo.Domain.Entities;
 
 /// <summary>
-/// Base shared property for DB entiyt
+/// Base class for all entities with common properties and tags
 /// </summary>
-public class BaseEntity
+public abstract class BaseEntity
 {
     /// <summary>
     /// Unique identifier
     /// </summary>
-    public int Id { get; set; }
+    public int Id { get; protected set; }
 
     /// <summary>
-    /// Name
+    /// Name of the entity
     /// </summary>
-
-    public string Nome { get; set; }
+    public string Name { get; protected set; }
 
     /// <summary>
-    /// Description
+    /// Optional description
     /// </summary>
-
-    public string? Descrizione { get; set; }
+    public string? Description { get; protected set; }
 
     /// <summary>
-    /// Loacal image path
+    /// Optional local image path
     /// </summary>
-
-    public string? ImmaginePath { get; set; }
+    public string? ImagePath { get; protected set; }
 
     /// <summary>
-    /// List of tag
+    /// Tags associated with the entity
     /// </summary>
+    public List<string> Tags {get; set;}
 
-    public List<string> Tags { get; set; } = [];
+    protected BaseEntity() { }
+
+    protected BaseEntity(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name is required", nameof(name));
+
+        Name = name;
+    }
+
+    /// <summary>
+    /// Add a tag to the entity
+    /// </summary>
+    public void AddTag(string tag)
+    {
+        if (!Tags.Contains(tag))
+            Tags.Add(tag);
+    }
+
+    /// <summary>
+    /// Remove a tag from the entity
+    /// </summary>
+    public void RemoveTag(string tag)
+    {
+        Tags.Remove(tag);
+    }
+
+    /// <summary>
+    /// Update the name of the entity
+    /// </summary>
+    public void UpdateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Name is required", nameof(name));
+        Name = name;
+    }
+
+    /// <summary>
+    /// Update the description of the entity
+    /// </summary>
+    public void UpdateDescription(string? description)
+    {
+        Description = description;
+    }
+
+    /// <summary>
+    /// Update the image path of the entity
+    /// </summary>
+    public void UpdateImmaginePath(string? path)
+    {
+        ImagePath = path;
+    }
 }

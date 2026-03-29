@@ -1,17 +1,17 @@
 ﻿namespace Expo.Domain.DTO.User;
 
 /// <summary>
-/// DTO to execute a reset password
+/// DTO used to execute a password reset request
 /// </summary>
 public class ResetPasswordRequestDto : EmailDto
 {
     /// <summary>
-    /// Reset password token
+    /// Token used for resetting the password
     /// </summary>
     public string Token { get; set; } = default!;
 
     /// <summary>
-    /// The New password
+    /// The new password to set
     /// </summary>
     public string NewPassword { get; set; } = default!;
 }

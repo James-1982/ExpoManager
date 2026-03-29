@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
 using Expo.API.Utils;
-using Expo.Domain.Interfaces.Services;
+using Expo.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Expo.API.Controllers;
@@ -42,7 +42,7 @@ public class ImageController(
         {
             _logger.LogInformation($"Checking for face in uploaded file: {file.FileName}");
 
-            var result = await _imageService.HasFace(file.OpenReadStream());
+            var result = await _imageService.HasFaceAsync(file.OpenReadStream());
 
             _logger.LogInformation($"Face detection result for file {file.FileName}: {result}");
 
