@@ -1,10 +1,10 @@
 ﻿using Asp.Versioning;
 using Expo.API.Extensions;
 using Expo.API.Utils;
+using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
 using Expo.Domain.DTO.DB;
 using Expo.Domain.DTO.User;
-using Expo.Domain.Interfaces.Services;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -111,7 +111,7 @@ public class AuthenticationController(
 
         return Ok(new
         {
-            token = tokenResult.Value.Value.Token,
+            token = tokenResult.Value.Value.AccessToken,
             refresh = tokenResult.Value.Value.RefreshToken,
             expiration = tokenResult.Value.Value.Expiration
         });

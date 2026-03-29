@@ -1,6 +1,6 @@
-﻿using Expo.Domain.Constants;
+﻿using Expo.Application.Interfaces.Services;
+using Expo.Domain.Constants;
 using Expo.Domain.DTO.User;
-using Expo.Domain.Interfaces.Services;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
@@ -8,22 +8,24 @@ using System.Security.Claims;
 namespace Expo.API.Services;
 
 /// <summary>
-/// <inheritdoc/>
+/// Service per la gestione degli utenti
 /// </summary>
-internal class UserService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) : IUserService
+internal class UserService : IUserService
 {
-    private readonly UserManager<IdentityUser> _userManager = userManager;
-    private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
+    public UserService(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    {
+        _userManager = userManager;
+        _roleManager = roleManager;
+    }
+
     public async Task<Result<UserDto?>> CreateUserAsync(string email, string password, string roleName)
     {
         var existing = await _userManager.FindByEmailAsync(email);
-
         if (existing != null)
-            return Result.Fail<UserDto?>("Invalid user or password");
+            return Result.Fail<UserDto?>("User with this email already exists");
 
         var user = new IdentityUser
         {
@@ -33,7 +35,6 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
         };
 
         var result = await _userManager.CreateAsync(user, password);
-
         if (!result.Succeeded)
             return Result.Fail<UserDto?>("Error while creating user");
 
@@ -43,7 +44,6 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
         await _userManager.AddToRoleAsync(user, roleName);
 
         var permissions = RoleHierarchy.GetRolePermissions(RoleHierarchy.GetRoleByName(roleName));
-
         foreach (var permission in permissions)
         {
             await _userManager.AddClaimAsync(user, new Claim(permission, "true"));
@@ -58,9 +58,7 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
 
         return Result.Ok(domainUser);
     }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
+
     public async Task<Result<bool>> PromoteUserAsync(string userId, string promoteRoleName)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -68,7 +66,6 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
             return Result.Fail("Invalid user");
 
         var currentRoles = await _userManager.GetRolesAsync(user);
-
         var currentRoleEnum = currentRoles
             .Select(r => Enum.TryParse<Role>(r, true, out var role) ? role : RoleHierarchy.GetMinRole())
             .DefaultIfEmpty(RoleHierarchy.GetMinRole())
@@ -85,14 +82,14 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
 
         await _userManager.AddToRoleAsync(user, promoteRole.ToString());
 
+        // Aggiorna claims per il nuovo ruolo
+        var newPermissions = RoleHierarchy.GetRolePermissions(promoteRole)
+                                          .Select(p => new Claim(p, "true"));
         var currentClaims = await _userManager.GetClaimsAsync(user);
         foreach (var claim in currentClaims)
         {
             await _userManager.RemoveClaimAsync(user, claim);
         }
-
-        var newPermissions = RoleHierarchy.GetRolePermissions(promoteRole)
-                                          .Select(p => new Claim(p, "true"));
         foreach (var claim in newPermissions)
         {
             await _userManager.AddClaimAsync(user, claim);
@@ -100,9 +97,7 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
 
         return Result.Ok();
     }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
+
     public async Task<Result<bool>> DemoteUserAsync(string userId, string demoteRoleName)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -121,19 +116,18 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
             return Result.Fail("Invalid role");
 
         if (demoteRole >= currentRole)
-            return Result.Fail("Invalid operation. Demote role is heigher than actual role");
+            return Result.Fail("Invalid operation. Demote role is higher than current role");
 
         await _userManager.RemoveFromRolesAsync(user, currentRoles);
-
         await _userManager.AddToRoleAsync(user, demoteRole.ToString());
 
+        var newClaims = RoleHierarchy.GetRolePermissions(demoteRole)
+                                     .Select(p => new Claim(p, "true"));
         var currentClaims = await _userManager.GetClaimsAsync(user);
         foreach (var claim in currentClaims)
         {
             await _userManager.RemoveClaimAsync(user, claim);
         }
-
-        var newClaims = RoleHierarchy.GetRolePermissions(demoteRole).Select(p => new Claim(p, "true"));
         foreach (var claim in newClaims)
         {
             await _userManager.AddClaimAsync(user, claim);
@@ -141,13 +135,10 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
 
         return Result.Ok();
     }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
+
     public async Task<Result<UserDto?>> GetUserByIdAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         if (user == null)
             return Result.Fail("Invalid user");
 
@@ -158,36 +149,27 @@ internal class UserService(UserManager<IdentityUser> userManager, RoleManager<Id
             Roles = await _userManager.GetRolesAsync(user)
         });
     }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
+
     public async Task<Result<IList<string>>> GetUserRolesAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
-
         if (user == null)
-            return Result.Fail("Invalid user");
+            return Result.Fail<IList<string>>("Invalid user");
 
         return Result.Ok(await _userManager.GetRolesAsync(user));
     }
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
+
     public async Task<Result<IList<UserDto>>> GetAllUsersAsync()
     {
         var users = _userManager.Users.ToList();
 
-        IList<UserDto> result = [];
-
-        foreach (var u in users)
+        var tasks = users.Select(async u => new UserDto
         {
-            result.Add(new UserDto
-            {
-                Id = u.Id,
-                Email = u.Email,
-                Roles = await _userManager.GetRolesAsync(u)
-            });
-        }
-        return Result.Ok(result);
+            Id = u.Id,
+            Email = u.Email,
+            Roles = await _userManager.GetRolesAsync(u)
+        });
+
+        return Result.Ok((IList<UserDto>)(await Task.WhenAll(tasks)).ToList());
     }
 }

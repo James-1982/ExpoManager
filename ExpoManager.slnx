@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="Expo.API/Expo.API.csproj" />
+  <Project Path="Expo.Application/Expo.Application.csproj" Id="5fea8d92-a11d-4820-8f7f-7d6f20befe25" />
   <Project Path="Expo.Domain/Expo.Domain.csproj" />
   <Project Path="Expo.Infrastructure/Expo.Infrastructure.csproj" />
 </Solution>

@@ -41,7 +41,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Expo.Domain\Expo.Domain.csproj" />
     <ProjectReference Include="..\Expo.Infrastructure\Expo.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
   </ItemGroup>
 
 </Project>

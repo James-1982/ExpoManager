@@ -17,6 +17,6 @@ public static class Users
         /// <summary>
         /// Password
         /// </summary>
-        public const string Passwrod = "Admin123!";
+        public const string Password = "Admin123!";
     }
 }

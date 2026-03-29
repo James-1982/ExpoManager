@@ -1,17 +1,17 @@
 ﻿namespace Expo.Domain.DTO.User;
 
 /// <summary>
-/// DTO with User data
+/// DTO representing user data
 /// </summary>
 public class UserDto : EmailDto
 {
     /// <summary>
-    /// Unique Id
+    /// Unique identifier of the user
     /// </summary>
     public string Id { get; set; } = null!;
 
     /// <summary>
-    /// Role linked to current User
+    /// Roles assigned to the user
     /// </summary>
-    public IList<string> Roles { get; set; } = [];
+    public IList<string> Roles { get; set; } = new List<string>();
 }

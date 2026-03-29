@@ -1,19 +1,19 @@
 ﻿using Asp.Versioning;
 using Expo.API.Extensions;
 using Expo.API.Utils;
+using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
 using Expo.Domain.DTO.DB;
-using Expo.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Expo.API.Controllers.Database;
 
 /// <summary>
-/// Controller to manage 'Padiglione'
+/// Controller to manage 'Pavilion'
 /// </summary>
 /// <param name="logger">Logger</param>
-/// <param name="service">pavilion service</param>
+/// <param name="service">Pavilion service</param>
 [ApiController]
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiVersion(ApiConstants.V1)]
@@ -24,7 +24,7 @@ public class PavilionController(
     private readonly ILogger<PavilionController> _logger = logger;
     private readonly IPavilionService _service = service;
     /// <summary>
-    /// Get all 'Padiglione'
+    /// Get all 'Pavilion'
     /// </summary>
     /// <returns>List of categories</returns>
     [HttpGet]
@@ -49,9 +49,9 @@ public class PavilionController(
         }
     }
     /// <summary>
-    /// Get 'Padiglione' by Id
+    /// Get 'Pavilion' by Id
     /// </summary>
-    /// <param name="id">'Padiglione' Id</param>
+    /// <param name="id">'Pavilion' Id</param>
     /// <returns></returns>
     [HttpGet("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
@@ -75,10 +75,10 @@ public class PavilionController(
         }
     }
     /// <summary>
-    /// Create a new 'Padiglione'
+    /// Create a new 'Pavilion'
     /// </summary>
-    /// <param name="model">'Padiglione' input model</param>
-    /// <returns>Created Padiglione</returns>
+    /// <param name="model">'Pavilion' input model</param>
+    /// <returns>Created Pavilion</returns>
     [HttpPost]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanCreateEntity)]
@@ -100,11 +100,11 @@ public class PavilionController(
         }
     }
     /// <summary>
-    /// Update an existing 'Padiglione'
+    /// Update an existing 'Pavilion'
     /// </summary>
-    /// <param name="id">'Padiglione' Id</param>
-    /// <param name="model">'Padiglione' input model</param>
-    /// <returns>Updated Padiglione</returns>
+    /// <param name="id">'Pavilion' Id</param>
+    /// <param name="model">'Pavilion' input model</param>
+    /// <returns>Updated Pavilion</returns>
     [HttpPut("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
@@ -127,9 +127,9 @@ public class PavilionController(
         }
     }
     /// <summary>
-    /// Upload a new image for an exisiting 'Padiglione'
+    /// Upload a new image for an exisiting 'Pavilion'
     /// </summary>
-    /// <param name="id">'Padiglione' Id</param>
+    /// <param name="id">'Pavilion' Id</param>
     /// <param name="immagine">Image file</param>
     /// <returns>URL of uploaded image</returns>
     [HttpPost("{id}/image")]
@@ -162,9 +162,9 @@ public class PavilionController(
         }
     }
     /// <summary>
-    /// Delete an image linked to an exisitng 'Padiglione'
+    /// Delete an image linked to an exisitng 'Pavilion'
     /// </summary>
-    /// <param name="id">'Padiglione' Id</param>
+    /// <param name="id">'Pavilion' Id</param>
     /// <returns>Status</returns>
     [HttpDelete("{id}/image")]
     [MapToApiVersion(ApiConstants.V1)]
@@ -188,9 +188,9 @@ public class PavilionController(
         }
     }
     /// <summary>
-    /// Request a delete operation to an exisitng 'Padiglione'
+    /// Request a delete operation to an exisitng 'Pavilion'
     /// </summary>
-    /// <param name="id">'Padiglione' Id</param>
+    /// <param name="id">'Pavilion' Id</param>
     /// <returns>Status</returns>
     [HttpDelete("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
