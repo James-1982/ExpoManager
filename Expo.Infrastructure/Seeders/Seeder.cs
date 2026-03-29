@@ -6,56 +6,59 @@ using System.Security.Claims;
 namespace Expo.Infrastructure.Seeders;
 
 /// <summary>
-/// Class to initialize data on DB
+/// Class to initialize default data on the database
 /// </summary>
 public static class Seeder
 {
     /// <summary>
-    /// Start seed method: Define the default admin user, role and perimissions
+    /// Seed default roles, admin user, and permissions
     /// </summary>
-    /// <param name="services"></param>
-    /// <returns></returns>
+    /// <param name="services">Service provider</param>
     public static async Task SeedAsync(IServiceProvider services)
     {
         using var scope = services.CreateScope();
+
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
+        // Create default roles
         foreach (Role role in Enum.GetValues(typeof(Role)))
         {
-            var name = RoleHierarchy.GetRoleName(role);
+            var roleName = RoleHierarchy.GetRoleName(role);
 
-            if (!await roleManager.RoleExistsAsync(name))
-                await roleManager.CreateAsync(new IdentityRole(name));
+            if (!await roleManager.RoleExistsAsync(roleName))
+                await roleManager.CreateAsync(new IdentityRole(roleName));
         }
 
-        //default admin user
-        var admin = await userManager.FindByEmailAsync(Users.AdminUser.Email);
+        // Create default admin user
+        var adminEmail = Users.AdminUser.Email;
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-        if (admin == null)
+        if (adminUser == null)
         {
-            admin = new IdentityUser
+            adminUser = new IdentityUser
             {
-                UserName = Users.AdminUser.Email,
-                Email = Users.AdminUser.Email,
+                UserName = adminEmail,
+                Email = adminEmail,
                 EmailConfirmed = true
             };
-            await userManager.CreateAsync(admin, Users.AdminUser.Passwrod);
 
-            await userManager.AddToRoleAsync(admin, RoleHierarchy.GetRoleName(Role.Admin));
+            await userManager.CreateAsync(adminUser, Users.AdminUser.Password);
+            await userManager.AddToRoleAsync(adminUser, RoleHierarchy.GetRoleName(Role.Admin));
         }
 
-        var adminRole = await roleManager.FindByNameAsync(RoleHierarchy.GetRoleName(Role.Admin));
-
+        // Assign default permissions to admin role
+        var adminRoleName = RoleHierarchy.GetRoleName(Role.Admin);
+        var adminRole = await roleManager.FindByNameAsync(adminRoleName);
         var permissions = RoleHierarchy.GetRolePermissions(Role.Admin);
 
-        var roleClaims = await roleManager.GetClaimsAsync(adminRole);
+        var existingClaims = await roleManager.GetClaimsAsync(adminRole);
 
         foreach (var permission in permissions)
         {
             var claim = new Claim(permission, "true");
 
-            if (!roleClaims.Any(c => c.Type == claim.Type))
+            if (!existingClaims.Any(c => c.Type == claim.Type))
                 await roleManager.AddClaimAsync(adminRole, claim);
         }
     }

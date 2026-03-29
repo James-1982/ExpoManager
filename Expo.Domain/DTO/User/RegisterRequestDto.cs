@@ -1,23 +1,26 @@
-﻿namespace Expo.Domain.DTO.User;
+﻿using Expo.Domain.DTO.User;
 
+namespace Expo.Domain.DTO.User
+{
 /// <summary>
-/// DTO to execute the registration of new user
+/// DTO to execute the registration of a new user
 /// </summary>
 public class RegisterRequestDto : EmailDto
 {
     /// <summary>
-    /// Password
+    /// Password for the new user
     /// </summary>
     public string Password { get; set; } = default!;
 }
 
 /// <summary>
-/// DTO used by admin to create a new user
+/// DTO used by admin to create a new user with a specific role
 /// </summary>
 public class RegisterUserDto : RegisterRequestDto
 {
     /// <summary>
-    /// Role for new user
+    /// Role to assign to the new user
     /// </summary>
     public string Role { get; set; } = default!;
+}
 }

@@ -18,7 +18,7 @@ public class EmailObject
     /// <summary>
     /// Email body
     /// </summary>
-    public string Bodby { get; set; }
+    public string Body { get; set; }
 
     /// <summary>
     /// Link

@@ -17,64 +17,57 @@ public static class MapsterConfig
     {
         // Padiglione
         TypeAdapterConfig<PavilionInDto, Pavilion>.NewConfig()
-            .Ignore(dest => dest.ImmaginePath)
+            .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
         TypeAdapterConfig<Pavilion, PavilionOutDto>.NewConfig()
-            .Map(dest => dest.ImmagineUrl,
-                 src => !string.IsNullOrEmpty(src.ImmaginePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImmaginePath}"
+            .Map(dest => dest.ImageUrl,
+                 src => !string.IsNullOrEmpty(src.ImagePath)
+                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>());
 
-
-        // Settore
-        TypeAdapterConfig<ExhibitionHallInDto, ExhibitionHall>.NewConfig()
-            .Ignore(dest => dest.ImmaginePath)
+        // ExhibitionArea
+        TypeAdapterConfig<ExhibitionAreaInDto, ExhibitionArea>.NewConfig()
+            .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
-        TypeAdapterConfig<ExhibitionHall, ExhibitionHallOutDto>.NewConfig()
-            .Map(dest => dest.ImmagineUrl,
-                 src => !string.IsNullOrEmpty(src.ImmaginePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImmaginePath}"
+        TypeAdapterConfig<ExhibitionArea, ExhibitionAreaOutDto>.NewConfig()
+            .Map(dest => dest.ImageUrl,
+                 src => !string.IsNullOrEmpty(src.ImagePath)
+                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>())
-            .Map(dest => dest.NumeroStands,
-                  src => (src.Stands.Count != 0)
-                         ? src.Stands.Count
-                         : 0);
+            .Map(dest => dest.NumberOfStands,
+                  src => src.Stands != null ? src.Stands.Count : 0);
 
         // Categoria
         TypeAdapterConfig<CategoryInDto, Category>.NewConfig()
-            .Ignore(dest => dest.ImmaginePath)
+            .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
         TypeAdapterConfig<Category, CategoryOutDto>.NewConfig()
-            .Map(dest => dest.ImmagineUrl,
-                 src => !string.IsNullOrEmpty(src.ImmaginePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImmaginePath}"
+            .Map(dest => dest.ImageUrl,
+                 src => !string.IsNullOrEmpty(src.ImagePath)
+                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>());
 
         // Stand
         TypeAdapterConfig<StandInDto, Stand>.NewConfig()
-            .Ignore(dest => dest.ImmaginePath)
+            .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
         TypeAdapterConfig<Stand, StandOutDto>.NewConfig()
-            .Map(dest => dest.ImmagineUrl,
-                 src => !string.IsNullOrEmpty(src.ImmaginePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImmaginePath}"
+            .Map(dest => dest.ImageUrl,
+                 src => !string.IsNullOrEmpty(src.ImagePath)
+                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>())
-            .Map(dest => dest.NomePadiglione,
-                  src => src.Padiglione != null
-                         ? src.Padiglione.Nome
-                         : string.Empty)
-            .Map(dest => dest.NomeSettore,
-                  src => src.Settore != null
-                         ? src.Settore.Nome
-                         : string.Empty);
+            .Map(dest => dest.PavilionName,
+                  src => src.Pavilion != null ? src.Pavilion.Name : string.Empty)
+            .Map(dest => dest.ExhibitionHallName,
+                  src => src.ExhibitionArea != null ? src.ExhibitionArea.Name : string.Empty);
 
         // User
         TypeAdapterConfig<RegisterRequestDto, RegisterUserDto>.NewConfig();

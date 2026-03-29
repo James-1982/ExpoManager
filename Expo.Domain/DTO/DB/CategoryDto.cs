@@ -1,43 +1,44 @@
-﻿namespace Expo.Domain.DTO.DB;
-
+﻿namespace Expo.Domain.DTO.DB
+{
 /// <summary>
-/// DTO containing data to add a new Categoria
+/// DTO containing data to add a new Category
 /// </summary>
 public class CategoryInDto
 {
     /// <summary>
-    /// Name of Entity
+    /// Name of the category
     /// </summary>
-    public string Nome { get; set; }
+    public string Name { get; set; }
 
     /// <summary>
-    /// Description of Entity
+    /// Description of the category
     /// </summary>
-    public string? Descrizione { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
-    /// Define if it's Highlighted
+    /// Indicates if the category is highlighted
     /// </summary>
-    public bool InEvidenza { get; set; }
+    public bool Highlighted { get; set; }
 
     /// <summary>
     /// List of tags
     /// </summary>
-    public List<string> Tags { get; set; } = [];
+    public List<string> Tags { get; set; } = new();
 }
 
 /// <summary>
-/// DTO output for entity Categoria
+/// DTO output for category entity
 /// </summary>
 public class CategoryOutDto : CategoryInDto
 {
     /// <summary>
-    /// Unique Id
+    /// Unique identifier
     /// </summary>
     public int Id { get; set; }
 
     /// <summary>
-    /// Public url to use to download associate image if present
+    /// Public URL for the associated image if present
     /// </summary>
-    public string? ImmagineUrl { get; set; }
+    public string? ImageUrl { get; set; }
+}
 }

@@ -1,6 +1,6 @@
 ﻿using Expo.API.Utils;
+using Expo.Application.Interfaces.Services;
 using Expo.Domain.DTO;
-using Expo.Domain.Interfaces.Services;
 using FluentResults;
 using Microsoft.Extensions.Options;
 using System.Net;
@@ -9,21 +9,24 @@ using System.Net.Mail;
 namespace Expo.API.Services;
 
 /// <summary>
-/// <inheritdoc/>
-/// </summary>
-///<remarks>
 /// Real email sender using SMTP
-///</remarks>
-internal class RegistationService(
-    IOptions<EmailSettings> settings,
-    ILogger<RegistationService> logger) : IAPIEmailSender
+/// </summary>
+internal class RegistationService : IAPIEmailSender
 {
-    private readonly EmailSettings _settings = settings.Value;
-    private readonly ILogger<RegistationService> _logger = logger;
+    private readonly EmailSettings _settings;
+    private readonly ILogger<RegistationService> _logger;
+
+    public RegistationService(IOptions<EmailSettings> settings, ILogger<RegistationService> logger)
+    {
+        _settings = settings.Value;
+        _logger = logger;
+    }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// Send an email using SMTP
     /// </summary>
+    /// <param name="emailData"></param>
+    /// <returns></returns>
     public async Task<Result<bool>> SendEmailAsync(EmailObject emailData)
     {
         if (!_settings.Enabled)
@@ -45,7 +48,7 @@ internal class RegistationService(
             {
                 From = new MailAddress(_settings.From),
                 Subject = emailData.Subject,
-                Body = emailData.Bodby,
+                Body = emailData.Body,
                 IsBodyHtml = true
             };
             mailMessage.To.Add(emailData.Email);

@@ -1,16 +1,16 @@
 ﻿using Asp.Versioning;
 using Expo.API.Extensions;
 using Expo.API.Utils;
+using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
 using Expo.Domain.DTO.DB;
-using Expo.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Expo.API.Controllers.Database;
 
 /// <summary>
-/// Controller to manage 'Categorie'
+/// Controller to manage 'Category'
 /// </summary>
 /// <param name="logger">Logger</param>
 /// <param name="service">Category service</param>
@@ -19,23 +19,19 @@ namespace Expo.API.Controllers.Database;
 [ApiVersion(ApiConstants.V1)]
 public class CategoryController(
     ILogger<CategoryController> logger,
-    ICategoriaService service) : ControllerBase
+    ICategoryService service) : ControllerBase
 {
-    #region Fields
-
     private readonly ILogger<CategoryController> _logger = logger;
-    private readonly ICategoriaService _service = service;
+    private readonly ICategoryService _service = service;
 
-    #endregion
+    #region CRUD Endpoints
+
     /// <summary>
-    /// Get all 'Categorie'
+    /// Get all 'Categories'
     /// </summary>
-    /// <returns>List of categories</returns>
     [HttpGet]
     [MapToApiVersion(ApiConstants.V1)]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAll()
     {
         try
@@ -48,20 +44,17 @@ public class CategoryController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error fetching all categories");
             return Problem(ex.Message);
         }
     }
+
     /// <summary>
-    /// Get 'Categoria' by Id
+    /// Get 'Category' by Id
     /// </summary>
-    /// <param name="id">'Categoria' Id</param>
-    /// <returns></returns>
     [HttpGet("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
     [AllowAnonymous]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(int id)
     {
         try
@@ -74,19 +67,17 @@ public class CategoryController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error fetching category with id {CategoryId}", id);
             return Problem(ex.Message);
         }
     }
+
     /// <summary>
-    /// Create a new 'Categoria'
+    /// Create a new 'Category'
     /// </summary>
-    /// <param name="model">'Categoria' input model</param>
-    /// <returns>Created category</returns>
     [HttpPost]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanCreateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Create([FromBody] CategoryInDto model)
     {
         try
@@ -94,87 +85,111 @@ public class CategoryController(
             var result = await _service.CreateAsync(model, this.GetBaseUrl());
 
             return result.IsSuccess
-                ? Ok(result.Value)
+                ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
                 : BadRequest(result.Errors.First().Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error creating category");
             return Problem(ex.Message);
         }
     }
+
     /// <summary>
-    /// Update an existing 'Categoria'
+    /// Update an existing 'Category'
     /// </summary>
-    /// <param name="id">'Categoria' Id</param>
-    /// <param name="model">'Categoria' input model</param>
-    /// <returns>Updated category</returns>
     [HttpPut("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] CategoryInDto model)
     {
         try
         {
             var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
 
-            return result.IsSuccess
-                ? Ok(result.Value)
+            if (result.IsSuccess)
+                return Ok(result.Value);
+
+            // Distinguere NotFound da BadRequest
+            return result.Errors.Any(e => e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                ? NotFound(result.Errors.First().Message)
                 : BadRequest(result.Errors.First().Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error updating category with id {CategoryId}", id);
             return Problem(ex.Message);
         }
     }
+
     /// <summary>
-    /// Upload a new image for an exisiting 'Categoria'
+    /// Request a delete operation for a 'Category'
     /// </summary>
-    /// <param name="id">'Categoria' Id</param>
-    /// <param name="immagine">Image file</param>
-    /// <returns>URL of uploaded image</returns>
-    [HttpPost("{id}/image")]
+    [HttpDelete("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
-    [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UploadImage(int id, IFormFile? immagine)
+    [Authorize(Policy = Policy.Entity.CanDeleteEntity)]
+    public IActionResult Delete(int id)
     {
         try
         {
-            if (immagine == null)
-            {
-                var msg = "Empty image";
-                _logger.LogError(msg);
-                return BadRequest(msg);
-            }
+            _service.DeleteAsync(id); // Async fire-and-forget
 
-            var result = await _service.UploadImageAsync(id, immagine.OpenReadStream(), immagine.FileName, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : BadRequest(result.Errors.First().Message);
+            _logger.LogInformation("Scheduled deletion for category {CategoryId}", id);
+            return Accepted();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error scheduling deletion for category {CategoryId}", id);
             return Problem(ex.Message);
         }
     }
+
+    #endregion
+
+    #region Image Endpoints
+
     /// <summary>
-    /// Delete an image linked to an exisitng 'Categoria'
+    /// Upload a new image for an existing 'Category'
     /// </summary>
-    /// <param name="id">'Categoria' Id</param>
-    /// <returns>Status</returns>
+    [HttpPost("{id}/image")]
+    [MapToApiVersion(ApiConstants.V1)]
+    [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
+    public async Task<IActionResult> UploadImage(int id, IFormFile? immagine)
+    {
+        if (immagine == null)
+        {
+            const string msg = "Empty image";
+            _logger.LogError(msg);
+            return BadRequest(msg);
+        }
+
+        try
+        {
+            var result = await _service.UploadImageAsync(
+                id,
+                immagine.OpenReadStream(),
+                immagine.FileName,
+                this.GetBaseUrl());
+
+            return result.IsSuccess
+                ? Ok(result.Value)
+                : result.Errors.Any(e => e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                    ? NotFound(result.Errors.First().Message)
+                    : BadRequest(result.Errors.First().Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading image for category {CategoryId}", id);
+            return Problem(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Delete an image linked to an existing 'Category'
+    /// </summary>
     [HttpDelete("{id}/image")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImage(int id)
     {
         try
@@ -183,27 +198,16 @@ public class CategoryController(
 
             return result.IsSuccess
                 ? Ok()
-                : BadRequest(result.Errors.First().Message);
+                : result.Errors.Any(e => e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                    ? NotFound(result.Errors.First().Message)
+                    : BadRequest(result.Errors.First().Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message);
+            _logger.LogError(ex, "Error deleting image for category {CategoryId}", id);
             return Problem(ex.Message);
         }
     }
-    /// <summary>
-    /// Request a delete operation to an exisitng 'Categoria'
-    /// </summary>
-    /// <param name="id">'Categoria' Id</param>
-    /// <returns>Status</returns>
-    [HttpDelete("{id}")]
-    [MapToApiVersion(ApiConstants.V1)]
-    [Authorize(Policy = Policy.Entity.CanDeleteEntity)]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public IActionResult Delete(int id)
-    {
-        _service.DeleteAsync(id);
 
-        return Accepted();
-    }
+    #endregion
 }

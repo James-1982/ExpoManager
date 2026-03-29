@@ -1,12 +1,22 @@
 ﻿namespace Expo.Domain.Entities;
 
 /// <summary>
-/// Entity Category
+/// Category entity with highlighting option
 /// </summary>
 public class Category : BaseEntity
 {
     /// <summary>
-    /// Highlighted
+    /// Indicates if the category is highlighted
     /// </summary>
-    public bool InEvidenza { get; set; }
+    public bool IsHighlighted { get; private set; }
+
+    public Category(string name, bool isHighlighted = false) : base(name)
+    {
+        IsHighlighted = isHighlighted;
+    }
+
+    /// <summary>
+    /// Set whether the category is highlighted
+    /// </summary>
+    public void SetHighlight(bool value) => IsHighlighted = value;
 }

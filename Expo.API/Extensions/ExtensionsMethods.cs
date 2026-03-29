@@ -1,4 +1,4 @@
-﻿using Expo.Domain.Interfaces.Repo;
+﻿using Expo.Domain.Interfaces.Repositories;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 

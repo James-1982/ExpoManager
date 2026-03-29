@@ -1,6 +1,219 @@
 @Expo.API_HostAddress = http://localhost:5075
 
-GET {{Expo.API_HostAddress}}/weatherforecast/
+#################################################
+# USERS
+#################################################
+
+### Get all users
+GET {{Expo.API_HostAddress}}/api/v1/users
 Accept: application/json
 
-###
+### Get user by id
+GET {{Expo.API_HostAddress}}/api/v1/users/{{userId}}
+Accept: application/json
+
+### Create user
+POST {{Expo.API_HostAddress}}/api/v1/users
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Password123!",
+  "roleName": "User"
+}
+
+### Promote user
+POST {{Expo.API_HostAddress}}/api/v1/users/{{userId}}/promote
+Content-Type: application/json
+
+{
+  "role": "Admin"
+}
+
+### Demote user
+POST {{Expo.API_HostAddress}}/api/v1/users/{{userId}}/demote
+Content-Type: application/json
+
+{
+  "role": "User"
+}
+
+#################################################
+# PAVILIONS
+#################################################
+
+### Get all pavilions
+GET {{Expo.API_HostAddress}}/api/v1/pavilions
+Accept: application/json
+
+### Get pavilion by id
+GET {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}
+Accept: application/json
+
+### Create pavilion
+POST {{Expo.API_HostAddress}}/api/v1/pavilions
+Content-Type: application/json
+
+{
+  "name": "Pavilion A",
+  "area": "North Wing",
+  "poweredBy": "Sponsor XYZ",
+  "tags": ["tech","expo"]
+}
+
+### Update pavilion
+PUT {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}
+Content-Type: application/json
+
+{
+  "name": "Pavilion A Updated",
+  "area": "North Wing",
+  "poweredBy": "Sponsor ABC",
+  "tags": ["innovation","expo"]
+}
+
+### Upload pavilion image
+POST {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}/image
+Content-Type: multipart/form-data
+
+immagine=@pavilion.png
+
+### Delete pavilion image
+DELETE {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}/image
+
+#################################################
+# EXHIBITION AREAS
+#################################################
+
+### Get all exhibition areas
+GET {{Expo.API_HostAddress}}/api/v1/exhibitionareas
+Accept: application/json
+
+### Get exhibition area by id
+GET {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}
+Accept: application/json
+
+### Create exhibition area
+POST {{Expo.API_HostAddress}}/api/v1/exhibitionareas
+Content-Type: application/json
+
+{
+  "name": "Hall 1",
+  "type": "Tech",
+  "state": "Active",
+  "tags": ["ai","vr"]
+}
+
+### Update exhibition area
+PUT {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}
+Content-Type: application/json
+
+{
+  "name": "Hall 1 Updated",
+  "type": "Tech",
+  "state": "Active",
+  "tags": ["ai","innovation"]
+}
+
+### Upload exhibition area image
+POST {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}/image
+Content-Type: multipart/form-data
+
+immagine=@hall.png
+
+### Delete exhibition area image
+DELETE {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}/image
+
+#################################################
+# STANDS
+#################################################
+
+### Get all stands
+GET {{Expo.API_HostAddress}}/api/v1/stands
+Accept: application/json
+
+### Get stand by id
+GET {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}
+Accept: application/json
+
+### Create stand
+POST {{Expo.API_HostAddress}}/api/v1/stands
+Content-Type: application/json
+
+{
+  "name": "Stand 101",
+  "dimensions": {
+    "Width": 3,
+    "Length": 4,
+    "Height": 2.5
+  },
+  "pavilionId": 1,
+  "exhibitionAreaId": 2,
+  "tags": ["tech","startup"]
+}
+
+### Update stand
+PUT {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}
+Content-Type: application/json
+
+{
+  "name": "Stand 101 Updated",
+  "dimensions": {
+    "Width": 3,
+    "Length": 4,
+    "Height": 2.5
+  },
+  "pavilionId": 1,
+  "exhibitionAreaId": 2,
+  "tags": ["innovation","expo"]
+}
+
+### Upload stand image
+POST {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}/image
+Content-Type: multipart/form-data
+
+immagine=@stand.png
+
+### Delete stand image
+DELETE {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}/image
+
+#################################################
+# CATEGORIES
+#################################################
+
+### Get all categories
+GET {{Expo.API_HostAddress}}/api/v1/categories
+Accept: application/json
+
+### Get category by id
+GET {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}
+Accept: application/json
+
+### Create category
+POST {{Expo.API_HostAddress}}/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Robotics",
+  "isHighlighted": true,
+  "tags": ["tech","future"]
+}
+
+### Update category
+PUT {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}
+Content-Type: application/json
+
+{
+  "name": "Robotics Updated",
+  "isHighlighted": true,
+  "tags": ["ai","innovation"]
+}
+
+### Upload category image
+POST {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}/image
+Content-Type: multipart/form-data
+
+immagine=@category.png
+
+### Delete category image
+DELETE {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}/image
