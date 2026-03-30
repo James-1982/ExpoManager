@@ -1,6 +1,7 @@
 ﻿using Expo.Application.DTO.DB;
 using Expo.Application.DTO.User;
 using Expo.Domain.Entities;
+using Expo.Domain.ValuiesObject;
 using Mapster;
 
 namespace Expo.API.Utils;
@@ -17,6 +18,7 @@ public static class MapsterConfig
     {
         // Padiglione
         TypeAdapterConfig<PavilionInDto, Pavilion>.NewConfig()
+            .ConstructUsing(src => new Pavilion(src.Name, src.Area, src.PoweredBy))
             .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
@@ -29,6 +31,7 @@ public static class MapsterConfig
 
         // ExhibitionArea
         TypeAdapterConfig<ExhibitionAreaInDto, ExhibitionArea>.NewConfig()
+            .ConstructUsing(src => new ExhibitionArea(src.Name, src.Type, src.Highlighted))
             .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
@@ -43,6 +46,7 @@ public static class MapsterConfig
 
         // Categoria
         TypeAdapterConfig<CategoryInDto, Category>.NewConfig()
+            .ConstructUsing(src => new Category(src.Name, src.Highlighted))
             .Ignore(dest => dest.ImagePath)
             .Ignore(dest => dest.Id);
 
@@ -55,8 +59,12 @@ public static class MapsterConfig
 
         // Stand
         TypeAdapterConfig<StandInDto, Stand>.NewConfig()
-            .Ignore(dest => dest.ImagePath)
-            .Ignore(dest => dest.Id);
+            .Ignore(dest => dest.Id)               // EF Core gestisce l'ID
+            .Ignore(dest => dest.Pavilion)        // proprietà protette
+            .Ignore(dest => dest.PavilionId)      // aggiorniamo manualmente nel servizio
+            .Ignore(dest => dest.ExhibitionArea)
+            .Ignore(dest => dest.ExhibitionAreaId)
+            .Map(dest => dest.Dimensions, src => new Dimensions(src.Width, src.Length));
 
         TypeAdapterConfig<Stand, StandOutDto>.NewConfig()
             .Map(dest => dest.ImageUrl,
@@ -64,10 +72,8 @@ public static class MapsterConfig
                         ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>())
-            .Map(dest => dest.PavilionName,
-                  src => src.Pavilion != null ? src.Pavilion.Name : string.Empty)
-            .Map(dest => dest.ExhibitionHallName,
-                  src => src.ExhibitionArea != null ? src.ExhibitionArea.Name : string.Empty);
+            .Map(dest => dest.PavilionName, src => src.Pavilion != null ? src.Pavilion.Name : string.Empty)
+            .Map(dest => dest.ExhibitionAreaName, src => src.ExhibitionArea != null ? src.ExhibitionArea.Name : string.Empty);
 
         // User
         TypeAdapterConfig<RegisterRequestDto, RegisterUserDto>.NewConfig();

@@ -154,7 +154,15 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.Use(async (context, next) =>
+{
+    var token = context.Request.Headers["Authorization"].ToString();
+    Console.WriteLine($"[JWT] Token ricevuto: {token}");
+    await next();
+});
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

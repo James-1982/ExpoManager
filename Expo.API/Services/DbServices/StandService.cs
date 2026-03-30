@@ -66,13 +66,13 @@ internal class StandService(
 
             if (dto.PavilionId.HasValue)
             {
-                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "pavilion");
+                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "Pavilion");
                 if (pad.IsFailed) return Result.Fail<StandOutDto>(pad.Errors.First().Message);
             }
 
-            if (dto.ExhibitionHallId.HasValue)
+            if (dto.ExhibitionAreaId.HasValue)
             {
-                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionHallId.Value, "ExhibitionHall");
+                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
                 if (sector.IsFailed) return Result.Fail<StandOutDto>(sector.Errors.First().Message);
             }
 
@@ -103,13 +103,13 @@ internal class StandService(
 
             if (dto.PavilionId.HasValue)
             {
-                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "pavilion");
+                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "Pavilion");
                 if (pad.IsFailed) return Result.Fail<StandOutDto>(pad.Errors.First().Message);
             }
 
-            if (dto.ExhibitionHallId.HasValue)
+            if (dto.ExhibitionAreaId.HasValue)
             {
-                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionHallId.Value, "ExhibitionHall");
+                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
                 if (sector.IsFailed) return Result.Fail<StandOutDto>(sector.Errors.First().Message);
             }
 

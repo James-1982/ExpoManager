@@ -10,27 +10,23 @@ public class Stand : BaseEntity
     public Dimensions Dimensions { get; private set; }
 
     // Foreign keys
-    public int PavilionId { get; private set; }
-    public int ExhibitionAreaId { get; private set; }
+    public int? PavilionId { get; private set; }
+    public int? ExhibitionAreaId { get; private set; }
 
     // Navigation properties
     public Pavilion Pavilion { get; private set; }
     public ExhibitionArea ExhibitionArea { get; private set; }
 
-    public Stand() : base()
-    { }
+    // Costruttore vuoto richiesto da EF Core
+    protected Stand() : base() { }
 
-    public Stand(string name, Dimensions dimensions, Pavilion pavilion, ExhibitionArea exhibitionArea)
-        : base(name)
+    // Costruttore minimale: solo nome e dimensioni
+    public Stand(string name, int width, int length) : base(name)
     {
-        Dimensions = dimensions;
-        Pavilion = pavilion ?? throw new ArgumentNullException(nameof(pavilion));
-        PavilionId = pavilion.Id;
-
-        ExhibitionArea = exhibitionArea ?? throw new ArgumentNullException(nameof(exhibitionArea));
-        ExhibitionAreaId = exhibitionArea.Id;
+        Dimensions = new Dimensions(width, length);
     }
 
+    // Metodi per aggiornare i riferimenti
     public void ChangePavilion(Pavilion newPavilion)
     {
         Pavilion = newPavilion ?? throw new ArgumentNullException(nameof(newPavilion));
