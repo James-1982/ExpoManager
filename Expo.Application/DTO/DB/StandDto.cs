@@ -6,8 +6,8 @@
 public class StandInDto
 {
     public string Name { get; set; }
-    public int Width { get; set; }
-    public int Length { get; set; }
+    public int? Width { get; set; }
+    public int? Length { get; set; }
     public int? PavilionId { get; set; }
     public int? ExhibitionAreaId { get; set; }
     public string? Description { get; set; }

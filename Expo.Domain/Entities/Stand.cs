@@ -7,11 +7,10 @@ namespace Expo.Domain.Entities;
 /// </summary>
 public class Stand : BaseEntity
 {
-    public Dimensions Dimensions { get; private set; }
+    public Dimensions Dimensions { get; private set; } = new Dimensions();
 
-    // Foreign keys
-    public int Width { get; set; }
-    public int Length { get; set; }
+    public int? Width { get; set; }
+    public int? Length { get; set; }
 
     // Foreign keys
     public int? PavilionId { get; private set; }
@@ -25,11 +24,15 @@ public class Stand : BaseEntity
     protected Stand() : base() { }
 
     // Costruttore minimale: solo nome e dimensioni
-    public Stand(string name, int width, int length) : base(name)
+    public Stand(string name, int? width, int? length) : base(name)
     {
         Width = width;
         Length = length;
-        Dimensions = new Dimensions(width, length);
+        if  (Width != null)
+            Dimensions.UpdateWidth(Width.Value);
+
+        if (Length != null)
+            Dimensions.UpdateLength(Length.Value);
     }
 
     // Metodi per aggiornare i riferimenti

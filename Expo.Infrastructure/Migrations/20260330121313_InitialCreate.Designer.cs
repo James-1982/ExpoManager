@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Expo.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260330102515_InitialCreate")]
+    [Migration("20260330121313_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -178,7 +178,7 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<string>("ImagePath")
                         .HasColumnType("text");
 
-                    b.Property<int>("Length")
+                    b.Property<int?>("Length")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -192,7 +192,7 @@ namespace Expo.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Width")
+                    b.Property<int?>("Width")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

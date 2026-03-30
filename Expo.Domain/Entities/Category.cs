@@ -10,8 +10,6 @@ public class Category : BaseEntity
     /// </summary>
     public bool IsHighlighted { get; private set; }
 
-
-
     public Category(string name, bool isHighlighted = false) : base(name)
     {
         IsHighlighted = isHighlighted;
