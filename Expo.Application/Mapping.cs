@@ -64,7 +64,7 @@ public static class MapsterConfig
             .Ignore(dest => dest.PavilionId)      // aggiorniamo manualmente nel servizio
             .Ignore(dest => dest.ExhibitionArea)
             .Ignore(dest => dest.ExhibitionAreaId)
-            .Map(dest => dest.Dimensions, src => new Dimensions(src.Width, src.Length));
+            .ConstructUsing(src => new Stand(src.Name, src.Width,src.Length));
 
         TypeAdapterConfig<Stand, StandOutDto>.NewConfig()
             .Map(dest => dest.ImageUrl,

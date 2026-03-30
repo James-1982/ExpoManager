@@ -10,6 +10,10 @@ public class Stand : BaseEntity
     public Dimensions Dimensions { get; private set; }
 
     // Foreign keys
+    public int Width { get; set; }
+    public int Length { get; set; }
+
+    // Foreign keys
     public int? PavilionId { get; private set; }
     public int? ExhibitionAreaId { get; private set; }
 
@@ -23,6 +27,8 @@ public class Stand : BaseEntity
     // Costruttore minimale: solo nome e dimensioni
     public Stand(string name, int width, int length) : base(name)
     {
+        Width = width;
+        Length = length;
         Dimensions = new Dimensions(width, length);
     }
 
