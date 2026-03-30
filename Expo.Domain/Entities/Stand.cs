@@ -9,8 +9,8 @@ public class Stand : BaseEntity
 {
     public Dimensions Dimensions { get; private set; } = new Dimensions();
 
-    public int? Width { get; set; }
-    public int? Length { get; set; }
+    public int? Width { get; private set; }
+    public int? Length { get; private set; }
 
     // Foreign keys
     public int? PavilionId { get; private set; }
@@ -51,5 +51,7 @@ public class Stand : BaseEntity
     public void UpdateDimensions(Dimensions newDimensions)
     {
         Dimensions = newDimensions ?? throw new ArgumentNullException(nameof(newDimensions));
+        Width = newDimensions.Width;
+        Length = newDimensions.Length;
     }
 }
