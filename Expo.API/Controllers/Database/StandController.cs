@@ -38,10 +38,7 @@ public class StandController(
         try
         {
             var result = await _service.GetAllAsync(this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : NotFound(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {
@@ -64,10 +61,7 @@ public class StandController(
         try
         {
             var result = await _service.GetByIdAsync(id, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : NotFound(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {
@@ -89,10 +83,7 @@ public class StandController(
         try
         {
             var result = await _service.CreateAsync(model, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : BadRequest(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {
@@ -116,10 +107,7 @@ public class StandController(
         try
         {
             var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : BadRequest(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {

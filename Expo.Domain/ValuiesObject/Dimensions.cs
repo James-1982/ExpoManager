@@ -7,6 +7,8 @@ namespace Expo.Domain.ValuiesObject;
 /// </summary>
 public class Dimensions
 {
+    private const int MinimumDimension = 0;
+
     /// <summary>
     /// Width of the entity
     /// </summary>
@@ -23,16 +25,16 @@ public class Dimensions
 
     public void UpdateWidth(int width)
     {
-        if (width < 0)
-            return;
+        if (width < MinimumDimension)
+            throw new ArgumentException($"Width cannot be negative. Value: {width}", nameof(width));
 
         Width = width;
     }
 
     public void UpdateLength(int length)
     {
-        if (length < 0)
-            return;
+        if (length < MinimumDimension)
+            throw new ArgumentException($"Length cannot be negative. Value: {length}", nameof(length));
 
         Length = length;
     }

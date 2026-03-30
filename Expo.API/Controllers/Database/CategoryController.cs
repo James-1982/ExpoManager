@@ -37,10 +37,7 @@ public class CategoryController(
         try
         {
             var result = await _service.GetAllAsync(this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : NotFound(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {
@@ -60,10 +57,7 @@ public class CategoryController(
         try
         {
             var result = await _service.GetByIdAsync(id, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : NotFound(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {
@@ -86,7 +80,7 @@ public class CategoryController(
 
             return result.IsSuccess
                 ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
-                : BadRequest(result.Errors.First().Message);
+                : this.ToActionResult(result);
         }
         catch (Exception ex)
         {
@@ -106,14 +100,7 @@ public class CategoryController(
         try
         {
             var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
-
-            if (result.IsSuccess)
-                return Ok(result.Value);
-
-            // Distinguere NotFound da BadRequest
-            return result.Errors.Any(e => e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
-                ? NotFound(result.Errors.First().Message)
-                : BadRequest(result.Errors.First().Message);
+            return this.ToActionResult(result);
         }
         catch (Exception ex)
         {

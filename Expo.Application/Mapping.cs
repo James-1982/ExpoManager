@@ -25,7 +25,7 @@ public static class MapsterConfig
         TypeAdapterConfig<Pavilion, PavilionOutDto>.NewConfig()
             .Map(dest => dest.ImageUrl,
                  src => !string.IsNullOrEmpty(src.ImagePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
+                        ? $"{GetBaseUrl()}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>());
 
@@ -38,7 +38,7 @@ public static class MapsterConfig
         TypeAdapterConfig<ExhibitionArea, ExhibitionAreaOutDto>.NewConfig()
             .Map(dest => dest.ImageUrl,
                  src => !string.IsNullOrEmpty(src.ImagePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
+                        ? $"{GetBaseUrl()}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>())
             .Map(dest => dest.NumberOfStands,
@@ -53,15 +53,15 @@ public static class MapsterConfig
         TypeAdapterConfig<Category, CategoryOutDto>.NewConfig()
             .Map(dest => dest.ImageUrl,
                  src => !string.IsNullOrEmpty(src.ImagePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
+                        ? $"{GetBaseUrl()}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>());
 
         // Stand
         TypeAdapterConfig<StandInDto, Stand>.NewConfig()
-            .Ignore(dest => dest.Id)               // EF Core gestisce l'ID
-            .Ignore(dest => dest.Pavilion)        // proprietà protette
-            .Ignore(dest => dest.PavilionId)      // aggiorniamo manualmente nel servizio
+            .Ignore(dest => dest.Id)
+            .Ignore(dest => dest.Pavilion)
+            .Ignore(dest => dest.PavilionId)
             .Ignore(dest => dest.ExhibitionArea)
             .Ignore(dest => dest.ExhibitionAreaId)
             .ConstructUsing(src => new Stand(src.Name, src.Width, src.Length));
@@ -69,7 +69,7 @@ public static class MapsterConfig
         TypeAdapterConfig<Stand, StandOutDto>.NewConfig()
             .Map(dest => dest.ImageUrl,
                  src => !string.IsNullOrEmpty(src.ImagePath)
-                        ? $"{MapContext.Current.Parameters["BaseUrl"]}/images/{src.ImagePath}"
+                        ? $"{GetBaseUrl()}/images/{src.ImagePath}"
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>())
             .Map(dest => dest.PavilionName, src => src.Pavilion != null ? src.Pavilion.Name : string.Empty)
@@ -77,5 +77,20 @@ public static class MapsterConfig
 
         // User
         TypeAdapterConfig<RegisterRequestDto, RegisterUserDto>.NewConfig();
+    }
+
+    /// <summary>
+    /// Helper method to get base URL safely
+    /// </summary>
+    private static string GetBaseUrl()
+    {
+        try
+        {
+            return MapContext.Current?.Parameters?["BaseUrl"]?.ToString() ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 }

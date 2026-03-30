@@ -9,16 +9,13 @@ public class Stand : BaseEntity
 {
     public Dimensions Dimensions { get; private set; } = new Dimensions();
 
-    public int? Width { get; private set; }
-    public int? Length { get; private set; }
-
     // Foreign keys
     public int? PavilionId { get; private set; }
     public int? ExhibitionAreaId { get; private set; }
 
     // Navigation properties
-    public Pavilion Pavilion { get; private set; }
-    public ExhibitionArea ExhibitionArea { get; private set; }
+    public Pavilion? Pavilion { get; private set; }
+    public ExhibitionArea? ExhibitionArea { get; private set; }
 
     // Costruttore vuoto richiesto da EF Core
     protected Stand() : base() { }
@@ -26,13 +23,11 @@ public class Stand : BaseEntity
     // Costruttore minimale: solo nome e dimensioni
     public Stand(string name, int? width, int? length) : base(name)
     {
-        Width = width;
-        Length = length;
-        if  (Width != null)
-            Dimensions.UpdateWidth(Width.Value);
+        if (width.HasValue)
+            Dimensions.UpdateWidth(width.Value);
 
-        if (Length != null)
-            Dimensions.UpdateLength(Length.Value);
+        if (length.HasValue)
+            Dimensions.UpdateLength(length.Value);
     }
 
     // Metodi per aggiornare i riferimenti
@@ -51,7 +46,5 @@ public class Stand : BaseEntity
     public void UpdateDimensions(Dimensions newDimensions)
     {
         Dimensions = newDimensions ?? throw new ArgumentNullException(nameof(newDimensions));
-        Width = newDimensions.Width;
-        Length = newDimensions.Length;
     }
 }

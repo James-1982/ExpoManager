@@ -5,13 +5,40 @@
 /// </summary>
 public class StandInDto
 {
-    public string Name { get; set; }
+    /// <summary>
+    /// Name of the stand
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Width of the stand (optional)
+    /// </summary>
     public int? Width { get; set; }
+
+    /// <summary>
+    /// Length of the stand (optional)
+    /// </summary>
     public int? Length { get; set; }
+
+    /// <summary>
+    /// Pavilion Id (optional)
+    /// </summary>
     public int? PavilionId { get; set; }
+
+    /// <summary>
+    /// Exhibition Area Id (optional)
+    /// </summary>
     public int? ExhibitionAreaId { get; set; }
+
+    /// <summary>
+    /// Description of the stand
+    /// </summary>
     public string? Description { get; set; }
-    public List<string> Tags { get; set; } = new();
+
+    /// <summary>
+    /// List of tags
+    /// </summary>
+    public List<string> Tags { get; set; } = [];
 }
 
 /// <summary>
@@ -19,8 +46,23 @@ public class StandInDto
 /// </summary>
 public class StandOutDto : StandInDto
 {
-public int Id { get; set; }
-public string? ImageUrl { get; set; }
-public string? PavilionName { get; set; }
-public string? ExhibitionAreaName { get; set; }
+    /// <summary>
+    /// Unique identifier
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
+    /// Public URL for the associated image if present
+    /// </summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>
+    /// Associated pavilion name
+    /// </summary>
+    public string? PavilionName { get; set; }
+
+    /// <summary>
+    /// Associated exhibition area name
+    /// </summary>
+    public string? ExhibitionAreaName { get; set; }
 }
