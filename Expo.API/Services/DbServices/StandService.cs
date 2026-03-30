@@ -118,25 +118,14 @@ internal class StandService(
                 entity.ChangeExhibitionArea(sector.Value);
             }
 
-            var width = dto.Width != null ? dto.Width.Value : 0;
-            var length = dto.Length != null ? dto.Length.Value : 0;
-
-           
-            if (width > 0 && length > 0)
-            {
-                var dimension = new Dimensions();
-                dimension.UpdateWidth(width);
-                dimension.UpdateLength(length);
-                entity.UpdateDimensions(dimension);
-            }
-
-            await _uow.SaveAsync();
+            entity.UpdateDimensions(dto.Width, dto.Length);
 
             var dtoOut = _mapper.From(entity)
                                 .AddParameters("BaseUrl", baseUrl)
                                 .AdaptToType<StandOutDto>();
 
             _logger.LogInformation($"Stand {id} updated");
+
             return Result.Ok(dtoOut);
         }
         catch (Exception ex)

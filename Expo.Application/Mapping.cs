@@ -3,6 +3,7 @@ using Expo.Application.DTO.User;
 using Expo.Domain.Entities;
 using Expo.Domain.ValuiesObject;
 using Mapster;
+using System.Xml.Serialization;
 
 namespace Expo.API.Utils;
 
@@ -73,7 +74,9 @@ public static class MapsterConfig
                         : null)
             .Map(dest => dest.Tags, src => src.Tags ?? new List<string>())
             .Map(dest => dest.PavilionName, src => src.Pavilion != null ? src.Pavilion.Name : string.Empty)
-            .Map(dest => dest.ExhibitionAreaName, src => src.ExhibitionArea != null ? src.ExhibitionArea.Name : string.Empty);
+            .Map(dest => dest.ExhibitionAreaName, src => src.ExhibitionArea != null ? src.ExhibitionArea.Name : string.Empty)
+            .Map(dest => dest.Width, src => src.Dimensions.Width)
+            .Map(dest => dest.Length, src => src.Dimensions.Length);
 
         // User
         TypeAdapterConfig<RegisterRequestDto, RegisterUserDto>.NewConfig();
