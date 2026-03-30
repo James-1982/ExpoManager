@@ -40,8 +40,11 @@ public class ExhibitionArea : BaseEntity
     /// </summary>
     public void AddStand(Stand stand)
     {
+        if (stand == null)
+            throw new ArgumentNullException(nameof(stand), "Stand cannot be null");
+
         if (_stands.Contains(stand))
-            throw new Exception("Stand already associated with the exhibition area");
+            throw new InvalidOperationException("Stand already associated with the exhibition area");
 
         _stands.Add(stand);
     }

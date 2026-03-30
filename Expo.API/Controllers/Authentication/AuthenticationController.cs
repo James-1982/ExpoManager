@@ -97,7 +97,8 @@ public class AuthenticationController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
     {
-        _logger.LogInformation($"Attempting login for user: {model.Email}");
+        _logger.LogInformation("Attempting login");
+
 
         var tokenResult = await _authService.LoginAsync(model);
 

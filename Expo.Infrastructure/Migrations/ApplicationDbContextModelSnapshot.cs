@@ -169,22 +169,28 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int>("ExhibitionAreaId")
+                    b.Property<int?>("ExhibitionAreaId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("text");
 
+                    b.Property<int?>("Length")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("PavilionId")
+                    b.Property<int?>("PavilionId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Tags")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int?>("Width")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -192,7 +198,14 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasIndex("PavilionId");
 
-                    b.ToTable("Stands");
+                    b.ToTable("Stands", t =>
+                        {
+                            t.Property("Length")
+                                .HasColumnName("Stand_Length");
+
+                            t.Property("Width")
+                                .HasColumnName("Stand_Width");
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -396,14 +409,12 @@ namespace Expo.Infrastructure.Migrations
                     b.HasOne("Expo.Domain.Entities.ExhibitionArea", "ExhibitionArea")
                         .WithMany("Stands")
                         .HasForeignKey("ExhibitionAreaId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Expo.Domain.Entities.Pavilion", "Pavilion")
                         .WithMany("Stands")
                         .HasForeignKey("PavilionId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.OwnsOne("Expo.Domain.ValuiesObject.Dimensions", "Dimensions", b1 =>
                         {

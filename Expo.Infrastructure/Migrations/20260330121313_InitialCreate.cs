@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -6,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Expo.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class IntialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -235,8 +236,10 @@ namespace Expo.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Width = table.Column<int>(type: "integer", nullable: false),
                     Length = table.Column<int>(type: "integer", nullable: false),
-                    PavilionId = table.Column<int>(type: "integer", nullable: false),
-                    ExhibitionAreaId = table.Column<int>(type: "integer", nullable: false),
+                    Stand_Width = table.Column<int>(type: "integer", nullable: true),
+                    Stand_Length = table.Column<int>(type: "integer", nullable: true),
+                    PavilionId = table.Column<int>(type: "integer", nullable: true),
+                    ExhibitionAreaId = table.Column<int>(type: "integer", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ImagePath = table.Column<string>(type: "text", nullable: true),

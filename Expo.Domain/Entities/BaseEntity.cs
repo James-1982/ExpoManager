@@ -28,7 +28,7 @@ public abstract class BaseEntity
     /// <summary>
     /// Tags associated with the entity
     /// </summary>
-    public List<string> Tags {get; set;}
+    public List<string> Tags { get; set; } = [];
 
     protected BaseEntity() { }
 

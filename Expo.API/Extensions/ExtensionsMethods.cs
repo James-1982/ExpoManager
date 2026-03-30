@@ -57,4 +57,31 @@ public static class ExtensionsMethods
             ? Result.Ok(entity)
             : Result.Fail($"{name} with {id} not exists"));
     }
+
+    /// <summary>
+    /// Convert FluentResult to standardized IActionResult response
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="controller"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static IActionResult ToActionResult<T>(this ControllerBase controller, Result<T> result)
+    {
+        if (result.IsSuccess)
+            return controller.Ok(result.Value);
+
+        var error = result.Errors.FirstOrDefault();
+        var errorMessage = error?.Message ?? "An unknown error occurred";
+
+        // Determina il codice di stato basato sul tipo di errore
+        var statusCode = errorMessage.Contains("not found", StringComparison.OrdinalIgnoreCase)
+            ? StatusCodes.Status404NotFound
+            : StatusCodes.Status400BadRequest;
+
+        return controller.Problem(
+            detail: errorMessage,
+            statusCode: statusCode,
+            title: statusCode == StatusCodes.Status404NotFound ? "Not Found" : "Bad Request"
+        );
+    }
 }

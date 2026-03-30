@@ -1,11 +1,12 @@
-﻿using FluentResults;
-using Hangfire;
-using Expo.API.Extensions;
+﻿using Expo.API.Extensions;
 using Expo.Application.DTO.DB;
-using Expo.Domain.Entities;
-using MapsterMapper;
 using Expo.Application.Interfaces.Services;
+using Expo.Domain.Entities;
 using Expo.Domain.Interfaces.Repositories;
+using Expo.Domain.ValuiesObject;
+using FluentResults;
+using Hangfire;
+using MapsterMapper;
 
 namespace Expo.API.Services.DbServices;
 
@@ -66,13 +67,13 @@ internal class StandService(
 
             if (dto.PavilionId.HasValue)
             {
-                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "pavilion");
+                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "Pavilion");
                 if (pad.IsFailed) return Result.Fail<StandOutDto>(pad.Errors.First().Message);
             }
 
-            if (dto.ExhibitionHallId.HasValue)
+            if (dto.ExhibitionAreaId.HasValue)
             {
-                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionHallId.Value, "ExhibitionHall");
+                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
                 if (sector.IsFailed) return Result.Fail<StandOutDto>(sector.Errors.First().Message);
             }
 
@@ -101,19 +102,34 @@ internal class StandService(
             if (entity == null)
                 return Result.Fail<StandOutDto>($"Stand with ID {id} not found");
 
+            _mapper.Map(dto, entity);
+
             if (dto.PavilionId.HasValue)
             {
-                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "pavilion");
+                var pad = await _uow.Pavilions.EnsureExists(dto.PavilionId.Value, "Pavilion");
                 if (pad.IsFailed) return Result.Fail<StandOutDto>(pad.Errors.First().Message);
+                entity.ChangePavilion(pad.Value);
             }
 
-            if (dto.ExhibitionHallId.HasValue)
+            if (dto.ExhibitionAreaId.HasValue)
             {
-                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionHallId.Value, "ExhibitionHall");
+                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
                 if (sector.IsFailed) return Result.Fail<StandOutDto>(sector.Errors.First().Message);
+                entity.ChangeExhibitionArea(sector.Value);
             }
 
-            _mapper.Map(dto, entity);
+            var width = dto.Width != null ? dto.Width.Value : 0;
+            var length = dto.Length != null ? dto.Length.Value : 0;
+
+           
+            if (width > 0 && length > 0)
+            {
+                var dimension = new Dimensions();
+                dimension.UpdateWidth(width);
+                dimension.UpdateLength(length);
+                entity.UpdateDimensions(dimension);
+            }
+
             await _uow.SaveAsync();
 
             var dtoOut = _mapper.From(entity)

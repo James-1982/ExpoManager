@@ -1,5 +1,3 @@
-using Mapster;
-using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -14,6 +12,7 @@ using Expo.API.Utils;
 using Expo.Infrastructure.Seeders;
 using Expo.Infrastructure.Persistence;
 using Expo.Application;
+using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,6 +105,33 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 // --------------------------------------------------
+// CORS
+// --------------------------------------------------
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", builder =>
+    {
+        builder
+            .WithOrigins(
+                "http://localhost:3000",
+                "http://localhost:3001",
+                "https://yourdomain.com"
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
+// --------------------------------------------------
+// RATE LIMITING
+// --------------------------------------------------
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+// --------------------------------------------------
 // BUILD APP
 // --------------------------------------------------
 var app = builder.Build();
@@ -150,6 +176,20 @@ if (app.Environment.IsDevelopment())
 // PIPELINE
 // --------------------------------------------------
 app.UseMiddleware<ErrorHandlerMiddleware>();
+
+// Security Headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Add("X-Frame-Options", "DENY");
+    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    await next();
+});
+
+app.UseIpRateLimiting();
+
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

@@ -56,6 +56,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(p => p.Area).HasMaxLength(200);
             entity.Property(p => p.PoweredBy).HasMaxLength(200);
 
+            entity.HasIndex(p => p.Name).IsUnique();
+
             entity.HasMany(p => p.Stands)
                   .WithOne(s => s.Pavilion)
                   .HasForeignKey(s => s.PavilionId)
@@ -67,7 +69,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             entity.Property(e => e.Name).IsRequired();
             entity.Property(e => e.Type).HasMaxLength(100);
-            entity.Property(e => e.State).HasMaxLength(100);
+
+            entity.HasIndex(e => e.Name).IsUnique();
 
             entity.HasMany(e => e.Stands)
                   .WithOne(s => s.ExhibitionArea)
@@ -80,6 +83,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         {
             entity.Property(c => c.Name).IsRequired();
             entity.Property(c => c.IsHighlighted).IsRequired();
+
+            entity.HasIndex(c => c.Name).IsUnique();
         });
 
         // Stand

@@ -29,8 +29,11 @@ public class Pavilion : BaseEntity
 
     public void AddStand(Stand stand)
     {
+        if (stand == null)
+            throw new ArgumentNullException(nameof(stand), "Stand cannot be null");
+
         if (_stands.Contains(stand))
-            throw new Exception("Stand already exists in pavilion");
+            throw new InvalidOperationException("Stand already exists in pavilion");
 
         _stands.Add(stand);
     }
