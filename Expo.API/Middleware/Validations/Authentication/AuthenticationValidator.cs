@@ -1,6 +1,6 @@
 ﻿using Expo.Domain.Constants;
-using Expo.Domain.DTO.DB;
-using Expo.Domain.DTO.User;
+using Expo.Application.DTO.DB;
+using Expo.Application.DTO.User;
 using FluentValidation;
 
 namespace Expo.API.Middleware.Validations.Authentication;

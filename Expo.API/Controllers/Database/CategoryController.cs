@@ -1,9 +1,9 @@
 ﻿using Asp.Versioning;
 using Expo.API.Extensions;
 using Expo.API.Utils;
+using Expo.Application.DTO.DB;
 using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
-using Expo.Domain.DTO.DB;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,6 +1,4 @@
-﻿
-using Expo.Domain.DTO.DB;
-using Expo.Domain.Enums;
+﻿using Expo.Domain.Enums;
 
 namespace Expo.Domain.Entities;
 

@@ -1,4 +1,4 @@
-﻿using Expo.Domain.DTO.DB;
+﻿using Expo.Application.DTO.DB;
 using FluentResults;
 
 namespace Expo.Application.Interfaces.Services

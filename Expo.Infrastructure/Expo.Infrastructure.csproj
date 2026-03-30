@@ -27,8 +27,4 @@
     <ProjectReference Include="..\Expo.Domain\Expo.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

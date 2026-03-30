@@ -1,6 +1,6 @@
 ﻿using Expo.API.Utils;
+using Expo.Application.DTO;
 using Expo.Application.Interfaces.Services;
-using Expo.Domain.DTO;
 using FluentResults;
 using Microsoft.Extensions.Options;
 using System.Net;

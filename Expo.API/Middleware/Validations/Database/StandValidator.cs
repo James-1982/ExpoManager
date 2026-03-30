@@ -1,4 +1,4 @@
-﻿using Expo.Domain.DTO.DB;
+﻿using Expo.Application.DTO.DB;
 using FluentValidation;
 
 namespace Expo.API.Middleware.Validations.Database;

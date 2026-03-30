@@ -127,7 +127,7 @@ internal static class ServicesExtension
 
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IPavilionService, PavilionService>();
-        services.AddScoped<IExhibitionAreaService, ExhibitionHallService>();
+        services.AddScoped<IExhibitionAreaService, ExhibitionAreaService>();
         services.AddScoped<IStandService, StandService>();
     }
     /// <summary>

@@ -1,7 +1,5 @@
 ﻿using Expo.Application.Interfaces.Services;
 using FluentResults;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Hosting;
 using OpenCvSharp;
 
 namespace Expo.API.Services;

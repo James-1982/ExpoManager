@@ -1,5 +1,5 @@
-﻿using Expo.Application.Interfaces.Services;
-using Expo.Domain.DTO;
+﻿using Expo.Application.DTO;
+using Expo.Application.Interfaces.Services;
 using FluentResults;
 using System.Net;
 

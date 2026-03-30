@@ -13,6 +13,7 @@ using Expo.API.Middleware.Validations;
 using Expo.API.Utils;
 using Expo.Infrastructure.Seeders;
 using Expo.Infrastructure.Persistence;
+using Expo.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,13 +31,9 @@ builder.Services.SetupInfrastructure(builder.Configuration); // DbContext, Repos
 builder.Services.AddExpoServices(); // I tuoi servizi applicativi
 
 // --------------------------------------------------
-// MAPSTER (DTO MAPPING)
+// APPLICATION LAYER
 // --------------------------------------------------
-MapsterConfig.RegisterMappings(); // Configurazioni globali Mapster
-var config = TypeAdapterConfig.GlobalSettings;
-builder.Services.AddSingleton(config);
-builder.Services.AddScoped<IMapper, ServiceMapper>();
-
+builder.Services.AddApplication();
 // --------------------------------------------------
 // CONTROLLERS + VALIDATION
 // --------------------------------------------------

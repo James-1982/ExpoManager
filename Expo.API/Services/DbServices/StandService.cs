@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using Hangfire;
 using Expo.API.Extensions;
-using Expo.Domain.DTO.DB;
+using Expo.Application.DTO.DB;
 using Expo.Domain.Entities;
 using MapsterMapper;
 using Expo.Application.Interfaces.Services;

@@ -1,10 +1,10 @@
 ﻿using Asp.Versioning;
 using Expo.API.Extensions;
 using Expo.API.Utils;
+using Expo.Application.DTO.DB;
+using Expo.Application.DTO.User;
 using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
-using Expo.Domain.DTO.DB;
-using Expo.Domain.DTO.User;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
