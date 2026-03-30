@@ -49,6 +49,9 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Categories");
                 });
 
@@ -74,7 +77,6 @@ namespace Expo.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("State")
-                        .HasMaxLength(100)
                         .HasColumnType("integer");
 
                     b.Property<string>("Tags")
@@ -86,6 +88,9 @@ namespace Expo.Infrastructure.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("ExhibitionAreas");
                 });
@@ -121,6 +126,9 @@ namespace Expo.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Pavilions");
                 });
@@ -175,9 +183,6 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<string>("ImagePath")
                         .HasColumnType("text");
 
-                    b.Property<int?>("Length")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -189,23 +194,13 @@ namespace Expo.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("Width")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExhibitionAreaId");
 
                     b.HasIndex("PavilionId");
 
-                    b.ToTable("Stands", t =>
-                        {
-                            t.Property("Length")
-                                .HasColumnName("Stand_Length");
-
-                            t.Property("Width")
-                                .HasColumnName("Stand_Width");
-                        });
+                    b.ToTable("Stands");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
