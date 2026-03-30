@@ -1,7 +1,7 @@
-﻿using Expo.Application.Interfaces.Services;
+﻿using Expo.Application.DTO;
+using Expo.Application.DTO.User;
+using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
-using Expo.Domain.DTO;
-using Expo.Domain.DTO.User;
 using Expo.Domain.Entities;
 using Expo.Domain.Interfaces.Repositories;
 using FluentResults;

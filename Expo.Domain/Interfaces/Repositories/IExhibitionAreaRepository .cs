@@ -1,9 +1,7 @@
 ﻿using Expo.Domain.Entities;
 
-using Expo.Domain.Interfaces.Repositories;
+namespace Expo.Domain.Interfaces.Repositories;
 
-namespace Expo.Domain.Interfaces.Repositories
-{
 /// <summary>
 /// Repository interface to manage <see cref="ExhibitionArea"/> entities
 /// </summary>
@@ -28,5 +26,4 @@ public interface IExhibitionAreaRepository : IRepository<ExhibitionArea>
     /// <param name="exhibitionAreaId">ExhibitionArea id</param>
     /// <returns>Number of stands in the ExhibitionArea</returns>
     Task<int> CountStandsByExhibitionAreaId(int exhibitionAreaId);
-}
 }

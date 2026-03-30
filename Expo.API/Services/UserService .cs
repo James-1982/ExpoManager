@@ -1,6 +1,6 @@
 ﻿using Expo.Application.Interfaces.Services;
 using Expo.Domain.Constants;
-using Expo.Domain.DTO.User;
+using Expo.Application.DTO.User;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;

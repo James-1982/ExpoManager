@@ -1,4 +1,4 @@
-﻿using Expo.Domain.DTO;
+﻿using Expo.Application.DTO;
 
 using FluentResults;
 

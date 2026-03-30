@@ -1,5 +1,5 @@
 ﻿using Expo.Application.Interfaces.Services;
-using Expo.Domain.DTO.DB;
+using Expo.Application.DTO.DB;
 using Expo.Domain.Entities;
 using Expo.Domain.Interfaces.Repositories;
 using FluentResults;
