@@ -19,9 +19,8 @@ namespace Expo.API.Controllers.Database;
 [ApiVersion(ApiConstants.V1)]
 public class ExhibitionAreaController(
     ILogger<ExhibitionAreaController> logger,
-    IExhibitionAreaService service) : ControllerBase
+    IExhibitionAreaService service) : BaseController(logger)
 {
-    private readonly ILogger<ExhibitionAreaController> _logger = logger;
     private readonly IExhibitionAreaService _service = service;
 
     /// <summary>
@@ -33,16 +32,9 @@ public class ExhibitionAreaController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAll()
     {
-        try
-        {
-            var result = await _service.GetAllAsync(this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching all ExhibitionAreas");
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+                    async () => await _service.GetAllAsync(this.GetBaseUrl()),
+                    "fetching all exhibition areas");
     }
 
     /// <summary>
@@ -54,16 +46,10 @@ public class ExhibitionAreaController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(int id)
     {
-        try
-        {
-            var result = await _service.GetByIdAsync(id, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching ExhibitionArea {ExhibitionAreaId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.GetByIdAsync(id, this.GetBaseUrl()),
+            $"fetching exhibition area {id}");
+
     }
 
     /// <summary>
@@ -73,20 +59,11 @@ public class ExhibitionAreaController(
     [Authorize(Policy = Policy.Entity.CanCreateEntity)]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Create([FromBody] ExhibitionAreaInDto model)
+    public async Task<IActionResult> Create([FromBody] ExhibitionAreaInDto dto)
     {
-        try
-        {
-            var result = await _service.CreateAsync(model, this.GetBaseUrl());
-            return result.IsSuccess
-                ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
-                : this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating ExhibitionArea");
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.CreateAsync(dto, this.GetBaseUrl()),
+            $"creating exhibition area {dto.Name}");
     }
 
     /// <summary>
@@ -97,18 +74,23 @@ public class ExhibitionAreaController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] ExhibitionAreaInDto model)
+    public async Task<IActionResult> Update(int id, [FromBody] ExhibitionAreaInDto dto)
     {
-        try
-        {
-            var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating ExhibitionArea {ExhibitionAreaId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UpdateAsync(id, dto, this.GetBaseUrl()),
+            $"updating exhibition area {dto.Name}");
+    }
+
+    /// <summary>
+    /// Request a delete operation for an existing 'ExhibitionArea'
+    /// </summary>
+    [HttpDelete("{id}")]
+    [Authorize(Policy = Policy.Entity.CanDeleteEntity)]
+    [ProducesResponseType(StatusCodes.Status202Accepted)]
+    public IActionResult Delete(int id)
+    {
+        _service.DeleteAsync(id); // Fire-and-forget background job
+        return Accepted();
     }
 
     /// <summary>
@@ -119,24 +101,14 @@ public class ExhibitionAreaController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UploadImage(int id, IFormFile? immagine)
+    public async Task<IActionResult> UploadImage(int id, IFormFile? image)
     {
-        try
-        {
-            if (immagine == null)
-            {
-                _logger.LogError("Empty image upload attempted for ExhibitionArea {ExhibitionAreaId}", id);
-                return BadRequest("Empty image");
-            }
+        if (image == null)
+            return BadRequest("Empty image");
 
-            var result = await _service.UploadImageAsync(id, immagine.OpenReadStream(), immagine.FileName, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error uploading image for ExhibitionArea {ExhibitionAreaId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
+            $"uploading image for exhibition area {id}");
     }
 
     /// <summary>
@@ -148,28 +120,8 @@ public class ExhibitionAreaController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImage(int id)
     {
-        try
-        {
-            var result = await _service.DeleteImageAsync(id);
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting image for ExhibitionArea {ExhibitionAreaId}", id);
-            return Problem(ex.Message);
-        }
-    }
-
-    /// <summary>
-    /// Request a delete operation for an existing 'ExhibitionArea'
-    /// </summary>
-    [HttpDelete("{id}")]
-    [Authorize(Policy = Policy.Entity.CanDeleteEntity)]
-    [ProducesResponseType(StatusCodes.Status202Accepted)]
-    public IActionResult Delete(int id)
-    {
-        _service.DeleteAsync(id);
-        _logger.LogInformation("Scheduled deletion for ExhibitionArea {ExhibitionAreaId}", id);
-        return Accepted();
+        return await HandleServiceCall(
+            async () => await _service.DeleteImageAsync(id),
+            $"deleting image for exhibition area {id}");
     }
 }

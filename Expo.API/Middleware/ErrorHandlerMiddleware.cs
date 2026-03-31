@@ -1,26 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
-namespace Expo.API.Middleware;
-
-/// <summary>
-/// Middleware to centralize API exeptions
-/// </summary>
-/// <remarks>
-/// 
-/// </remarks>
-/// <param name="next"></param>
-/// <param name="logger"></param>
-public class ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
+public class ErrorHandlerMiddleware
 {
-    private readonly RequestDelegate _next = next;
-    private readonly ILogger<ErrorHandlerMiddleware> _logger = logger;
-    /// <summary>
-    /// Invoke method
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public async Task Invoke(HttpContext context)
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ErrorHandlerMiddleware> _logger;
+
+    public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
     {
         try
         {
@@ -30,18 +22,26 @@ public class ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMi
         {
             _logger.LogError(ex, "Unhandled exception");
 
+            var statusCode = ex switch
+            {
+                KeyNotFoundException => StatusCodes.Status404NotFound,
+                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
+                _ => StatusCodes.Status500InternalServerError
+            };
+
             var problem = new ProblemDetails
             {
-                Status = StatusCodes.Status500InternalServerError,
-                Title = "Internal Server Error",
+                Status = statusCode,
+                Title = statusCode == 500 ? "Internal Server Error" : ex.GetType().Name,
                 Detail = ex.Message,
                 Instance = context.Request.Path
             };
 
             context.Response.ContentType = "application/problem+json";
-            context.Response.StatusCode = problem.Status.Value;
+            context.Response.StatusCode = statusCode;
 
-            await context.Response.WriteAsync(JsonSerializer.Serialize(problem));
+            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(problem, options));
         }
     }
 }

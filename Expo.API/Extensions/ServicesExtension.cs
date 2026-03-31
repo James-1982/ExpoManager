@@ -124,7 +124,7 @@ internal static class ServicesExtension
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IImageService, ImageService>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IPavilionService, PavilionService>();
         services.AddScoped<IExhibitionAreaService, ExhibitionAreaService>();

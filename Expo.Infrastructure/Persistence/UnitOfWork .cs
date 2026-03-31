@@ -19,7 +19,7 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     /// <summary>
     /// Repository to manage Settori Table
     /// </summary>
-    public IExhibitionAreaRepository ExhibitionHalls { get; } = new ExhibitionAreaRepository(context);
+    public IExhibitionAreaRepository ExhibitionAreas { get; } = new ExhibitionAreaRepository(context);
     /// <summary>
     /// Repository to manage Categorie Table
     /// </summary>
@@ -28,6 +28,10 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     /// Repository to manage Stands Table
     /// </summary>
     public IStandRepository Stands { get; } = new StandRepository(context);
+    /// <summary>
+    /// Repository to manage Tags Table
+    /// </summary>
+    public ITagRepository Tags { get; } = new TagRepository(context);
     /// <summary>
     /// Repository to manage RefreshToken
     /// </summary>
@@ -41,7 +45,7 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     public IRepository<TEntity>? GetRepository<TEntity>() where TEntity : class
     {
         if (typeof(TEntity) == typeof(Pavilion)) return (IRepository<TEntity>)Pavilions;
-        if (typeof(TEntity) == typeof(ExhibitionArea)) return (IRepository<TEntity>)ExhibitionHalls;
+        if (typeof(TEntity) == typeof(ExhibitionArea)) return (IRepository<TEntity>)ExhibitionAreas;
         if (typeof(TEntity) == typeof(Category)) return (IRepository<TEntity>)Categories;
         if (typeof(TEntity) == typeof(Stand)) return (IRepository<TEntity>)Stands;
 

@@ -26,9 +26,19 @@ public abstract class BaseEntity
     public string? ImagePath { get; protected set; }
 
     /// <summary>
+    /// Last modify date time
+    /// </summary>
+    public DateTime? LastModify { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Last user who modified the entity
+    /// </summary>
+    public string? ModifyBy { get; set; }
+
+    /// <summary>
     /// Tags associated with the entity
     /// </summary>
-    public List<string> Tags { get; set; } = [];
+    public List<Tag> Tags { get; set; } = [];
 
     protected BaseEntity() { }
 
@@ -43,18 +53,45 @@ public abstract class BaseEntity
     /// <summary>
     /// Add a tag to the entity
     /// </summary>
-    public void AddTag(string tag)
+    public void AddTag(Tag tag)
     {
-        if (!Tags.Contains(tag))
+        if (!Tags.Any(t => t.Name == tag.Name))
             Tags.Add(tag);
     }
 
     /// <summary>
-    /// Remove a tag from the entity
+    /// Adds multiple tags at once
     /// </summary>
-    public void RemoveTag(string tag)
+    public void AddTags(IEnumerable<Tag> tags)
     {
-        Tags.Remove(tag);
+        if (tags == null) return;
+
+        foreach (var tag in tags)
+            AddTag(tag);
+    }
+
+    /// <summary>
+    /// Remove a tag from the entity by id
+    /// </summary>
+    public void RemoveTag(int tagId)
+    {
+        var tag = Tags.FirstOrDefault(t => t.Id == tagId);
+        if (tag != null)
+        {
+            Tags.Remove(tag);
+        }
+    }
+
+    /// <summary>
+    /// Remove a tag from the entity by name
+    /// </summary>
+    public void RemoveTagByName(string tagName)
+    {
+        var tag = Tags.FirstOrDefault(t => t.Name.Equals(tagName, StringComparison.OrdinalIgnoreCase));
+        if (tag != null)
+        {
+            Tags.Remove(tag);
+        }
     }
 
     /// <summary>
@@ -78,8 +115,17 @@ public abstract class BaseEntity
     /// <summary>
     /// Update the image path of the entity
     /// </summary>
-    public void UpdateImmaginePath(string? path)
+    public void UpdateImagePath(string? path)
     {
         ImagePath = path;
+    }
+
+    /// <summary>
+    /// Update Audit: user who modified and last modify date time
+    /// </summary>
+    public void SetAuditInfo(string userName)
+    {
+        ModifyBy = userName;
+        LastModify = DateTime.UtcNow;
     }
 }

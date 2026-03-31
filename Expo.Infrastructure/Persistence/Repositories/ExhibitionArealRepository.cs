@@ -16,10 +16,11 @@ public class ExhibitionAreaRepository(ApplicationDbContext context)
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public async Task<ExhibitionArea?> GetWithStandsAsync(int id)
+    public async Task<ExhibitionArea?> GetWithRelationsAsync(int id)
     {
         return await _context.ExhibitionAreas
                              .Include(p => p.Stands)
+                             .Include(p => p.Tags)
                              .FirstOrDefaultAsync(p => p.Id == id);
     }
 
@@ -27,10 +28,11 @@ public class ExhibitionAreaRepository(ApplicationDbContext context)
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public async Task<IEnumerable<ExhibitionArea>> GetAllWithStandsAsync()
+    public async Task<IEnumerable<ExhibitionArea>> GetAllWithRelationsAsync()
     {
         return await _context.ExhibitionAreas
                              .Include(p => p.Stands)
+                             .Include(p => p.Tags)
                              .ToListAsync();
     }
 

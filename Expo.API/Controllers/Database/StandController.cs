@@ -19,9 +19,8 @@ namespace Expo.API.Controllers.Database;
 [ApiVersion(ApiConstants.V1)]
 public class StandController(
     ILogger<StandController> logger,
-    IStandService service) : ControllerBase
+    IStandService service) : BaseController(logger)
 {
-    private readonly ILogger<StandController> _logger = logger;
     private readonly IStandService _service = service;
 
     /// <summary>
@@ -35,16 +34,9 @@ public class StandController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAll()
     {
-        try
-        {
-            var result = await _service.GetAllAsync(this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+       return await HandleServiceCall(
+            async () => await _service.GetAllAsync(this.GetBaseUrl()),
+            "fetching all stands");
     }
     /// <summary>
     /// Get 'Stand' by Id
@@ -58,68 +50,47 @@ public class StandController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(int id)
     {
-        try
-        {
-            var result = await _service.GetByIdAsync(id, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.GetByIdAsync(id, this.GetBaseUrl()),
+            $"fetching stand {id}");
     }
     /// <summary>
     /// Create a new 'Stand'
     /// </summary>
-    /// <param name="model">'Stand' input model</param>
+    /// <param name="dto">'Stand' input model</param>
     /// <returns>Created Stand</returns>
     [HttpPost]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanCreateEntity)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Create([FromBody] StandInDto model)
+    public async Task<IActionResult> Create([FromBody] StandInDto dto)
     {
-        try
-        {
-            var result = await _service.CreateAsync(model, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+       return await HandleServiceCall(
+            async () => await _service.CreateAsync(dto, this.GetBaseUrl()),
+            $"creating stand {dto.Name}");
     }
     /// <summary>
     /// Update an existing 'Stand'
     /// </summary>
     /// <param name="id">'Stand' Id</param>
-    /// <param name="model">'Stand' input model</param>
+    /// <param name="dto">'Stand' input model</param>
     /// <returns>Updated Stand</returns>
     [HttpPut("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] StandInDto model)
+    public async Task<IActionResult> Update(int id, [FromBody] StandInDto dto)
     {
-        try
-        {
-            var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UpdateAsync(id, dto, this.GetBaseUrl()),
+            $"updating stand {dto.Name}");
     }
     /// <summary>
     /// Upload a new image for an exisiting 'Stand'
     /// </summary>
     /// <param name="id">'Stand' Id</param>
-    /// <param name="immagine">Image file</param>
+    /// <param name="image">Image file</param>
     /// <returns>URL of uploaded image</returns>
     [HttpPost("{id}/image")]
     [MapToApiVersion(ApiConstants.V1)]
@@ -127,28 +98,14 @@ public class StandController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UploadImage(int id, IFormFile? immagine)
+    public async Task<IActionResult> UploadImage(int id, IFormFile? image)
     {
-        try
-        {
-            if (immagine == null)
-            {
-                var msg = "Empty image";
-                _logger.LogError(msg);
-                return BadRequest(msg);
-            }
+        if (image == null)
+            return BadRequest("Empty image");
 
-            var result = await _service.UploadImageAsync(id, immagine.OpenReadStream(), immagine.FileName, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : BadRequest(result.Errors.First().Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
+            $"uploading image for stand {id}");
     }
     /// <summary>
     /// Delete an image linked to an exisitng 'Stand'
@@ -162,19 +119,9 @@ public class StandController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImage(int id)
     {
-        try
-        {
-            var result = await _service.DeleteImageAsync(id);
-
-            return result.IsSuccess
-                ? Ok()
-                : BadRequest(result.Errors.First().Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.DeleteImageAsync(id),
+            $"deleting image for stand {id}");
     }
     /// <summary>
     /// Request a delete operation to an exisitng 'Stand'
@@ -187,8 +134,7 @@ public class StandController(
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     public IActionResult Delete(int id)
     {
-        _service.DeleteAsync(id);
-
+        _service.DeleteAsync(id); // fire-and-forget
         return Accepted();
     }
 }

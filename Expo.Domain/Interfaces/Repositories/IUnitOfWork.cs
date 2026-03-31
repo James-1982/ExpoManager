@@ -11,9 +11,9 @@ public interface IUnitOfWork
     IPavilionRepository Pavilions { get; }
 
     /// <summary>
-    /// Repository for Exhibition Halls
+    /// Repository for Exhibition Area
     /// </summary>
-    IExhibitionAreaRepository ExhibitionHalls { get; }
+    IExhibitionAreaRepository ExhibitionAreas { get; }
 
     /// <summary>
     /// Repository for Categories
@@ -24,6 +24,11 @@ public interface IUnitOfWork
     /// Repository for Stands
     /// </summary>
     IStandRepository Stands { get; }
+
+    /// <summary>
+    /// Repository for Tags
+    /// </summary>
+    ITagRepository Tags { get; }
 
     /// <summary>
     /// Repository for Refresh Tokens

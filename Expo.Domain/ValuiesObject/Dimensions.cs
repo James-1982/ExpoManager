@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging.Abstractions;
-
-namespace Expo.Domain.ValuiesObject;
+﻿namespace Expo.Domain.ValuiesObject;
 
 /// <summary>
 /// Value object representing width and length of an entity

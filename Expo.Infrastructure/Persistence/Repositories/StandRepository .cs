@@ -18,6 +18,7 @@ public class StandRepository(ApplicationDbContext context) : Repository<Stand>(c
         return await _dbSet
                     .Include(s => s.Pavilion)
                     .Include(s => s.ExhibitionArea)
+                    .Include(s => s.Tags)
                     .ToListAsync();
     }
     /// <summary>
@@ -29,6 +30,7 @@ public class StandRepository(ApplicationDbContext context) : Repository<Stand>(c
         return await _dbSet
                     .Include(s => s.Pavilion)
                     .Include(s => s.ExhibitionArea)
+                    .Include(s => s.Tags)
                     .FirstOrDefaultAsync(s => s.Id == id);
     }
     /// <summary>

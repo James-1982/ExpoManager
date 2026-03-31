@@ -40,5 +40,15 @@
         /// Public URL for the associated image if present
         /// </summary>
         public string? ImageUrl { get; set; }
+
+        /// <summary>
+        /// Last modify date time
+        /// </summary>
+        public string? LastModify { get; set; }
+
+        /// <summary>
+        /// Last user who modified the entity
+        /// </summary>
+        public string? ModifyBy { get; set; }
     }
 }

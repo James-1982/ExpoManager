@@ -47,4 +47,13 @@ public class Stand : BaseEntity
     {
         Dimensions = newDimensions ?? throw new ArgumentNullException(nameof(newDimensions));
     }
+
+    public void UpdateDimensions(int? width, int? length)
+    {
+        if (width.HasValue)
+            Dimensions.UpdateWidth(width.Value);
+
+        if (length.HasValue)
+            Dimensions.UpdateLength(length.Value);
+    }
 }

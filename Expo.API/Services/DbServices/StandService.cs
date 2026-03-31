@@ -3,7 +3,6 @@ using Expo.Application.DTO.DB;
 using Expo.Application.Interfaces.Services;
 using Expo.Domain.Entities;
 using Expo.Domain.Interfaces.Repositories;
-using Expo.Domain.ValuiesObject;
 using FluentResults;
 using Hangfire;
 using MapsterMapper;
@@ -18,6 +17,7 @@ internal class StandService(
     IMapper mapper,
     IImageService imageService,
     IBackgroundJobClient backgroundJobClient,
+        ICurrentUserService currentUser,
     IUnitOfWork uow) : IStandService
 {
     #region Fields
@@ -27,6 +27,7 @@ internal class StandService(
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _uow = uow;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+    private readonly ICurrentUserService _currentUser = currentUser;
 
     #endregion
 
@@ -73,11 +74,14 @@ internal class StandService(
 
             if (dto.ExhibitionAreaId.HasValue)
             {
-                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
+                var sector = await _uow.ExhibitionAreas.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
                 if (sector.IsFailed) return Result.Fail<StandOutDto>(sector.Errors.First().Message);
             }
 
             var entity = _mapper.Map<Stand>(dto);
+            var tags = await _uow.Tags.GetOrCreateTagsAsync(dto.Tags);
+            entity.AddTags(tags);
+            entity.SetAuditInfo(_currentUser.UserName);
             await _uow.Stands.AddAsync(entity);
             await _uow.SaveAsync();
 
@@ -100,7 +104,11 @@ internal class StandService(
         {
             var entity = await _uow.Stands.GetWithRelationsAsync(id);
             if (entity == null)
-                return Result.Fail<StandOutDto>($"Stand with ID {id} not found");
+            {
+                var msg = $"Stand {id} not found";
+                _logger.LogWarning(msg);
+                return Result.Fail<StandOutDto>(msg);
+            }
 
             _mapper.Map(dto, entity);
 
@@ -113,30 +121,25 @@ internal class StandService(
 
             if (dto.ExhibitionAreaId.HasValue)
             {
-                var sector = await _uow.ExhibitionHalls.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
+                var sector = await _uow.ExhibitionAreas.EnsureExists(dto.ExhibitionAreaId.Value, "ExhibitionArea");
                 if (sector.IsFailed) return Result.Fail<StandOutDto>(sector.Errors.First().Message);
                 entity.ChangeExhibitionArea(sector.Value);
             }
 
-            var width = dto.Width != null ? dto.Width.Value : 0;
-            var length = dto.Length != null ? dto.Length.Value : 0;
+            entity.UpdateDimensions(dto.Width, dto.Length);
 
-           
-            if (width > 0 && length > 0)
-            {
-                var dimension = new Dimensions();
-                dimension.UpdateWidth(width);
-                dimension.UpdateLength(length);
-                entity.UpdateDimensions(dimension);
-            }
+            await entity.Tags.UpdateEntityTagsAsync(dto.Tags, _uow);
+            entity.SetAuditInfo(_currentUser.UserName);
+            _uow.Stands.Update(entity);
 
-            await _uow.SaveAsync();
+            var update = await _uow.Stands.GetWithRelationsAsync(entity.Id);
 
-            var dtoOut = _mapper.From(entity)
+            var dtoOut = _mapper.From(update)
                                 .AddParameters("BaseUrl", baseUrl)
                                 .AdaptToType<StandOutDto>();
 
             _logger.LogInformation($"Stand {id} updated");
+
             return Result.Ok(dtoOut);
         }
         catch (Exception ex)
@@ -184,7 +187,8 @@ internal class StandService(
         var result = await _imageService.SaveImageAsync(nameof(Stand), imageStream, entity.Id.ToString(), Path.GetExtension(fileName));
         if (result.IsFailed) return Result.Fail<string>(result.Errors.First().Message);
 
-        entity.UpdateImmaginePath(result.Value);
+        entity.SetAuditInfo(_currentUser.UserName);
+        entity.UpdateImagePath(result.Value);
         await _uow.SaveAsync();
 
         var url = $"{baseUrl}/{_imageService.ImagesFolder}/{entity.ImagePath}";
@@ -201,7 +205,7 @@ internal class StandService(
         if (!string.IsNullOrEmpty(entity.ImagePath))
             await _imageService.DeleteImageAsync(entity.ImagePath);
 
-        entity.UpdateImmaginePath(null);
+        entity.UpdateImagePath(null);
         await _uow.SaveAsync();
 
         _logger.LogInformation($"Image deleted for stand {id}");
