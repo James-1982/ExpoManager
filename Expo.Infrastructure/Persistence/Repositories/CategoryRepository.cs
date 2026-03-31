@@ -12,7 +12,7 @@ namespace Expo.Infrastructure.Persistence.Repositories;
 public class CategoryRepository(ApplicationDbContext context) : Repository<Category>(context), ICategoryRepository
 {
     /// <summary>
-    /// Recupera una categoria con i tag inclusi
+    /// Get category with id and its relations
     /// </summary>
     public async Task<Category?> GetWithRelationsAsync(int id)
     {
@@ -22,7 +22,7 @@ public class CategoryRepository(ApplicationDbContext context) : Repository<Categ
     }
 
     /// <summary>
-    /// Recupera tutte le categorie con i tag inclusi
+    /// Get all categories with id and its relations
     /// </summary>
     public async Task<IEnumerable<Category>> GetAllWithRelationsAsync()
     {

@@ -44,7 +44,7 @@ public static class MapsterConfig
                  src => !string.IsNullOrEmpty(src.ImagePath)
                         ? $"{GetBaseUrl()}/images/{src.ImagePath}"
                         : null)
-                .Map(dest => dest.Tags,
+            .Map(dest => dest.Tags,
                      src => src.Tags != null
                             ? src.Tags.Select(t => t.Name).ToList()
                             : new List<string>())
@@ -76,6 +76,7 @@ public static class MapsterConfig
             .Ignore(dest => dest.ExhibitionArea)
             .Ignore(dest => dest.ExhibitionAreaId)
             .Ignore(dest => dest.Tags)
+            .Ignore(dest => dest.Categories)
             .ConstructUsing(src => new Stand(src.Name, src.Width, src.Length));
 
         TypeAdapterConfig<Stand, StandOutDto>.NewConfig()
@@ -87,10 +88,14 @@ public static class MapsterConfig
             .Map(dest => dest.ExhibitionAreaName, src => src.ExhibitionArea != null ? src.ExhibitionArea.Name : string.Empty)
             .Map(dest => dest.Width, src => src.Dimensions.Width)
             .Map(dest => dest.Length, src => src.Dimensions.Length)
-                            .Map(dest => dest.Tags,
-                     src => src.Tags != null
-                            ? src.Tags.Select(t => t.Name).ToList()
-                            : new List<string>());
+            .Map(dest => dest.Tags,
+                 src => src.Tags != null
+                        ? src.Tags.Select(t => t.Name).ToList()
+                        : new List<string>())
+            .Map(dest => dest.Categories,
+                 src => src.Categories != null
+                        ? src.Categories.Select(c => new CategoryDto { Id = c.Id, Name = c.Name }).ToList()
+                        : new List<CategoryDto>());
 
         // User
         TypeAdapterConfig<RegisterRequestDto, RegisterUserDto>.NewConfig();

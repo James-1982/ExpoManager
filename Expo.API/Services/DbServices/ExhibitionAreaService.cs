@@ -121,9 +121,12 @@ internal class ExhibitionAreaService(
 
     public async Task DeleteJob(int id)
     {
-        var entity = await _uow.ExhibitionAreas.GetByIdAsync(id);
+        var entity = await _uow.ExhibitionAreas.GetWithRelationsAsync(id);
         if (entity == null)
+        {
+            _logger.LogWarning($"Exhibition Hall {id} not found for deletion");
             return;
+        }
 
         var imagePath = entity.ImagePath; // salva il path prima della cancellazione
 

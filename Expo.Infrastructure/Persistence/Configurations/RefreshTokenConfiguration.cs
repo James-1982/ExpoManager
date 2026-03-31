@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace Expo.Infrastructure.Persistence.Configurations
+{
 public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
     public void Configure(EntityTypeBuilder<RefreshToken> entity)
@@ -20,4 +22,5 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         entity.Property(r => r.Expires)
               .IsRequired();
     }
+}
 }

@@ -2,10 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace Expo.Infrastructure.Persistence.Configurations
+{
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
     public void Configure(EntityTypeBuilder<Category> entity)
     {
+        entity.HasKey(t => t.Id);
+
         entity.Property(c => c.Name)
               .IsRequired()
               .HasMaxLength(100);
@@ -22,14 +26,22 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         entity.HasIndex(c => c.Name).IsUnique();
 
         entity.HasMany(c => c.Tags)
-              .WithMany(t => t.Categories)
-              .UsingEntity<Dictionary<string, object>>(
-                  "CategoryTags",
-                  j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId"),
-                  j => j.HasOne<Category>().WithMany().HasForeignKey("CategoryId"),
-                  j =>
-                  {
-                      j.HasKey("CategoryId", "TagId");
-                  });
+                  .WithMany(t => t.Categories)
+                  .UsingEntity<Dictionary<string, object>>(
+                      "CategoryTags",
+                      j => j.HasOne<Tag>()
+                            .WithMany()
+                            .HasForeignKey("TagId")
+                            .OnDelete(DeleteBehavior.Cascade),
+                      j => j.HasOne<Category>()
+                            .WithMany()
+                            .HasForeignKey("CategoryId")
+                            .OnDelete(DeleteBehavior.Cascade),
+                      j =>
+                      {
+                          j.ToTable("CategoryTags");
+                          j.HasKey("CategoryId", "TagId");
+                      });
     }
+}
 }
