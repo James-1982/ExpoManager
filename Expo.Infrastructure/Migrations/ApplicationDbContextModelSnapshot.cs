@@ -34,7 +34,7 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("CategoryTags");
+                    b.ToTable("CategoryTags", (string)null);
                 });
 
             modelBuilder.Entity("ExhibitionAreaTags", b =>
@@ -49,7 +49,7 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("ExhibitionAreaTags");
+                    b.ToTable("ExhibitionAreaTags", (string)null);
                 });
 
             modelBuilder.Entity("Expo.Domain.Entities.Category", b =>
@@ -247,6 +247,9 @@ namespace Expo.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ExhibitionAreaId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.HasIndex("PavilionId");
 
@@ -482,7 +485,22 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("PavilionTags");
+                    b.ToTable("PavilionTags", (string)null);
+                });
+
+            modelBuilder.Entity("StandCategories", b =>
+                {
+                    b.Property<int>("StandId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StandId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("StandCategories", (string)null);
                 });
 
             modelBuilder.Entity("StandTags", b =>
@@ -497,7 +515,7 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasIndex("TagId");
 
-                    b.ToTable("StandTags");
+                    b.ToTable("StandTags", (string)null);
                 });
 
             modelBuilder.Entity("CategoryTags", b =>
@@ -635,6 +653,21 @@ namespace Expo.Infrastructure.Migrations
                     b.HasOne("Expo.Domain.Entities.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("StandCategories", b =>
+                {
+                    b.HasOne("Expo.Domain.Entities.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Expo.Domain.Entities.Stand", null)
+                        .WithMany()
+                        .HasForeignKey("StandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

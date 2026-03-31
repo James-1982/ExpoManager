@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace Expo.Infrastructure.Persistence.Configurations
+{
 public class TagConfiguration : IEntityTypeConfiguration<Tag>
 {
     public void Configure(EntityTypeBuilder<Tag> entity)
@@ -17,4 +19,5 @@ public class TagConfiguration : IEntityTypeConfiguration<Tag>
         entity.HasIndex(t => t.Name)
               .IsUnique();
     }
+}
 }

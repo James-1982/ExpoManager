@@ -29,4 +29,26 @@ internal static class TagHelper
         foreach (var t in tagsToAdd)
             entityTags.Add(t);
     }
+
+
+    public static async Task UpdateEntityCategoriesAsync(
+            this Stand entity,
+            IEnumerable<int> categoryIds,
+            IUnitOfWork uow)
+    {
+        if (entity.Categories == null)
+            return;
+
+        if (categoryIds == null)
+            return;
+
+        entity.Categories.Clear();
+
+        foreach (var id in categoryIds)
+        {
+            var category = await uow.Categories.GetByIdAsync(id);
+            if (category != null)
+                entity.Categories.Add(category);
+        }
+    }
 }

@@ -2,21 +2,27 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+namespace Expo.Infrastructure.Persistence.Configurations
+{
 public class ExhibitionAreaConfiguration : IEntityTypeConfiguration<ExhibitionArea>
 {
     public void Configure(EntityTypeBuilder<ExhibitionArea> entity)
     {
+        entity.HasKey(e => e.Id);
+
         entity.Property(e => e.Name)
               .IsRequired()
               .HasMaxLength(100);
 
         entity.Property(e => e.Type)
-              .HasConversion<string>()
-              .HasMaxLength(50);
+               .HasConversion<string>()
+               .HasMaxLength(50)
+               .IsRequired();
 
         entity.Property(e => e.State)
-              .HasConversion<string>()
-              .HasMaxLength(50);
+               .HasConversion<string>()
+               .HasMaxLength(50)
+               .IsRequired();
 
         entity.Property(e => e.ModifyBy)
               .HasMaxLength(256);
@@ -27,14 +33,22 @@ public class ExhibitionAreaConfiguration : IEntityTypeConfiguration<ExhibitionAr
         entity.HasIndex(e => e.Name).IsUnique();
 
         entity.HasMany(e => e.Tags)
-              .WithMany(t => t.ExhibitionAreas)
-              .UsingEntity<Dictionary<string, object>>(
-                  "ExhibitionAreaTags",
-                  j => j.HasOne<Tag>().WithMany().HasForeignKey("TagId"),
-                  j => j.HasOne<ExhibitionArea>().WithMany().HasForeignKey("ExhibitionAreaId"),
-                  j =>
-                  {
-                      j.HasKey("ExhibitionAreaId", "TagId");
-                  });
+                .WithMany(t => t.ExhibitionAreas)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ExhibitionAreaTags",
+                    j => j.HasOne<Tag>()
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j => j.HasOne<ExhibitionArea>()
+                        .WithMany()
+                        .HasForeignKey("ExhibitionAreaId")
+                        .OnDelete(DeleteBehavior.Cascade),
+                    j =>
+                    {
+                        j.ToTable("ExhibitionAreaTags");
+                        j.HasKey("ExhibitionAreaId", "TagId");
+                    });
     }
+}
 }

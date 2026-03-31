@@ -98,7 +98,6 @@ internal class CategoryService(
             await entity.Tags.UpdateEntityTagsAsync(dto.Tags, _uow);
             entity.SetAuditInfo(_currentUser.UserName);
             _uow.Categories.Update(entity);
-
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
@@ -123,7 +122,10 @@ internal class CategoryService(
     {
         var entity = await _uow.Categories.GetByIdAsync(id);
         if (entity == null)
+        {
+            _logger.LogWarning($"Category {id} not found for deletion");
             return;
+        }
 
         var imagePath = entity.ImagePath;
 

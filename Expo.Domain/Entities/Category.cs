@@ -19,4 +19,7 @@ public class Category : BaseEntity
     /// Set whether the category is highlighted
     /// </summary>
     public void SetHighlight(bool value) => IsHighlighted = value;
+
+    // Navigation
+    public ICollection<Stand> Stands { get; private set; } = new List<Stand>();
 }

@@ -111,7 +111,7 @@ internal class PavilionService(
 
     public async Task DeleteJob(int id)
     {
-        var entity = await _uow.Pavilions.GetByIdAsync(id);
+        var entity = await _uow.Pavilions.GetWithRelationsAsync(id);
         if (entity == null)
         {
             _logger.LogWarning($"Pavilion {id} not found for deletion");

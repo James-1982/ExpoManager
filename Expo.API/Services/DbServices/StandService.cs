@@ -79,8 +79,12 @@ internal class StandService(
             }
 
             var entity = _mapper.Map<Stand>(dto);
+
             var tags = await _uow.Tags.GetOrCreateTagsAsync(dto.Tags);
             entity.AddTags(tags);
+
+            await entity.UpdateEntityCategoriesAsync(dto.CategoryIds, _uow);
+
             entity.SetAuditInfo(_currentUser.UserName);
             await _uow.Stands.AddAsync(entity);
             await _uow.SaveAsync();
@@ -129,9 +133,12 @@ internal class StandService(
             entity.UpdateDimensions(dto.Width, dto.Length);
 
             await entity.Tags.UpdateEntityTagsAsync(dto.Tags, _uow);
+
+            await entity.UpdateEntityCategoriesAsync(dto.CategoryIds, _uow);
+
             entity.SetAuditInfo(_currentUser.UserName);
             _uow.Stands.Update(entity);
-
+            await _uow.SaveAsync();
             var update = await _uow.Stands.GetWithRelationsAsync(entity.Id);
 
             var dtoOut = _mapper.From(update)
@@ -156,8 +163,12 @@ internal class StandService(
 
     public async Task DeleteJob(int id)
     {
-        var entity = await _uow.Stands.GetByIdAsync(id);
-        if (entity == null) return;
+        var entity = await _uow.Stands.GetWithRelationsAsync(id);
+        if (entity == null)
+        {
+            _logger.LogWarning($"Stand {id} not found for deletion");
+            return;
+        }
 
         _uow.Stands.Remove(entity);
         await _uow.SaveAsync();

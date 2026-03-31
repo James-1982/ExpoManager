@@ -1,7 +1,4 @@
-﻿
-
-
-using Expo.Domain.Entities;
+﻿using Expo.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

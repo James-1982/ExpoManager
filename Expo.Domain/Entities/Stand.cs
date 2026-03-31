@@ -9,13 +9,14 @@ public class Stand : BaseEntity
 {
     public Dimensions Dimensions { get; private set; } = new Dimensions();
 
-    // Foreign keys
+    // Main relations
     public int? PavilionId { get; private set; }
-    public int? ExhibitionAreaId { get; private set; }
-
-    // Navigation properties
     public Pavilion? Pavilion { get; private set; }
+
+    public int? ExhibitionAreaId { get; private set; }
     public ExhibitionArea? ExhibitionArea { get; private set; }
+
+    public ICollection<Category> Categories { get; private set; } = [];
 
     // Costruttore vuoto richiesto da EF Core
     protected Stand() : base() { }
