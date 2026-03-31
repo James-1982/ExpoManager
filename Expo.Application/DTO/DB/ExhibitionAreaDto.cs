@@ -15,7 +15,7 @@ public class ExhibitionAreaInDto
     /// <summary>
     /// Type of the exhibition area
     /// </summary>
-    public string? Type { get; set; }
+    public AreaType? Type { get; set; }
 
     /// <summary>
     /// Description of the exhibition area
@@ -57,4 +57,14 @@ public class ExhibitionAreaOutDto : ExhibitionAreaInDto
     /// Number of stands in this exhibition area
     /// </summary>
     public int NumberOfStands { get; set; }
+
+    /// <summary>
+    /// Last modify date time
+    /// </summary>
+    public string? LastModify { get; set; }
+
+    /// <summary>
+    /// Last user who modified the entity
+    /// </summary>
+    public string? ModifyBy { get; set; }
 }

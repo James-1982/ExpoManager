@@ -19,9 +19,8 @@ namespace Expo.API.Controllers.Database;
 [ApiVersion(ApiConstants.V1)]
 public class PavilionController(
     ILogger<PavilionController> logger,
-    IPavilionService service) : ControllerBase
+    IPavilionService service) : BaseController(logger)
 {
-    private readonly ILogger<PavilionController> _logger = logger;
     private readonly IPavilionService _service = service;
     /// <summary>
     /// Get all 'Pavilion'
@@ -34,16 +33,9 @@ public class PavilionController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAll()
     {
-        try
-        {
-            var result = await _service.GetAllAsync(this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.GetAllAsync(this.GetBaseUrl()),
+            "fetching all pavilions");
     }
     /// <summary>
     /// Get 'Pavilion' by Id
@@ -57,68 +49,47 @@ public class PavilionController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(int id)
     {
-        try
-        {
-            var result = await _service.GetByIdAsync(id, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.GetByIdAsync(id, this.GetBaseUrl()),
+            $"fetching pavilion {id}");
     }
     /// <summary>
     /// Create a new 'Pavilion'
     /// </summary>
-    /// <param name="model">'Pavilion' input model</param>
+    /// <param name="dto">'Pavilion' input model</param>
     /// <returns>Created Pavilion</returns>
     [HttpPost]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanCreateEntity)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> Create([FromBody] PavilionInDto model)
+    public async Task<IActionResult> Create([FromBody] PavilionInDto dto)
     {
-        try
-        {
-            var result = await _service.CreateAsync(model, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.CreateAsync(dto, this.GetBaseUrl()),
+            $"creating pavilion {dto.Name}");
     }
     /// <summary>
     /// Update an existing 'Pavilion'
     /// </summary>
     /// <param name="id">'Pavilion' Id</param>
-    /// <param name="model">'Pavilion' input model</param>
+    /// <param name="dto">'Pavilion' input model</param>
     /// <returns>Updated Pavilion</returns>
     [HttpPut("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Update(int id, [FromBody] PavilionInDto model)
+    public async Task<IActionResult> Update(int id, [FromBody] PavilionInDto dto)
     {
-        try
-        {
-            var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UpdateAsync(id, dto, this.GetBaseUrl()),
+            $"updating pavilion {dto.Name}");
     }
     /// <summary>
     /// Upload a new image for an exisiting 'Pavilion'
     /// </summary>
     /// <param name="id">'Pavilion' Id</param>
-    /// <param name="immagine">Image file</param>
+    /// <param name="image">Image file</param>
     /// <returns>URL of uploaded image</returns>
     [HttpPost("{id}/image")]
     [MapToApiVersion(ApiConstants.V1)]
@@ -126,28 +97,14 @@ public class PavilionController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UploadImage(int id, IFormFile? immagine)
+    public async Task<IActionResult> UploadImage(int id, IFormFile? image)
     {
-        try
-        {
-            if (immagine == null)
-            {
-                var msg = "Empty image";
-                _logger.LogError(msg);
-                return BadRequest(msg);
-            }
+        if (image == null)
+            return BadRequest("Empty image");
 
-            var result = await _service.UploadImageAsync(id, immagine.OpenReadStream(), immagine.FileName, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : BadRequest(result.Errors.First().Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
+            $"uploading image for pavilion {id}");
     }
     /// <summary>
     /// Delete an image linked to an exisitng 'Pavilion'
@@ -161,19 +118,9 @@ public class PavilionController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImage(int id)
     {
-        try
-        {
-            var result = await _service.DeleteImageAsync(id);
-
-            return result.IsSuccess
-                ? Ok()
-                : BadRequest(result.Errors.First().Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex.Message);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.DeleteImageAsync(id),
+            $"deleting image for pavilion {id}");
     }
     /// <summary>
     /// Request a delete operation to an exisitng 'Pavilion'
@@ -186,8 +133,7 @@ public class PavilionController(
     [ProducesResponseType(StatusCodes.Status202Accepted)]
     public IActionResult Delete(int id)
     {
-        _service.DeleteAsync(id);
-
+        _service.DeleteAsync(id); // fire-and-forget
         return Accepted();
     }
 }

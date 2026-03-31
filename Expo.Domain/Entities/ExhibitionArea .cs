@@ -10,7 +10,7 @@ public class ExhibitionArea : BaseEntity
     /// <summary>
     /// Type of the exhibition area
     /// </summary>
-    public string? Type { get; private set; }
+    public AreaType Type { get; private set; } = AreaType.Undefined;
 
     /// <summary>
     /// Current state of the exhibition area
@@ -22,13 +22,13 @@ public class ExhibitionArea : BaseEntity
     /// </summary>
     public bool IsHighlighted { get; private set; }
 
-    private readonly List<Stand> _stands = new();
+    private readonly List<Stand> _stands = [];
     /// <summary>
     /// Collection of stands in this exhibition area
     /// </summary>
     public IReadOnlyCollection<Stand> Stands => _stands.AsReadOnly();
 
-    public ExhibitionArea(string name, string? type = null, bool isHighlighted = false)
+    public ExhibitionArea(string name, AreaType type = AreaType.Undefined, bool isHighlighted = false)
         : base(name)
     {
         Type = type;
@@ -67,5 +67,5 @@ public class ExhibitionArea : BaseEntity
     /// <summary>
     /// Update the type of the exhibition area
     /// </summary>
-    public void UpdateType(string? type) => Type = type;
+    public void UpdateType(AreaType type) => Type = type;
 }

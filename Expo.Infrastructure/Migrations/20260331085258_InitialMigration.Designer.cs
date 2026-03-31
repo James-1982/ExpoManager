@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Expo.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260330121313_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260331085258_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,36 @@ namespace Expo.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CategoryTags", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CategoryId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("CategoryTags");
+                });
+
+            modelBuilder.Entity("ExhibitionAreaTags", b =>
+                {
+                    b.Property<int>("ExhibitionAreaId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ExhibitionAreaId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("ExhibitionAreaTags");
+                });
 
             modelBuilder.Entity("Expo.Domain.Entities.Category", b =>
                 {
@@ -42,15 +72,22 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<bool>("IsHighlighted")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastModify")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifyBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Tags")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -72,23 +109,32 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<bool>("IsHighlighted")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("LastModify")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifyBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("State")
-                        .HasMaxLength(100)
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Tags")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Type")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("ExhibitionAreas");
                 });
@@ -111,19 +157,26 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<string>("ImagePath")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("LastModify")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifyBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("PoweredBy")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("Tags")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Pavilions");
                 });
@@ -147,7 +200,8 @@ namespace Expo.Infrastructure.Migrations
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -178,21 +232,19 @@ namespace Expo.Infrastructure.Migrations
                     b.Property<string>("ImagePath")
                         .HasColumnType("text");
 
-                    b.Property<int?>("Length")
-                        .HasColumnType("integer");
+                    b.Property<DateTime?>("LastModify")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ModifyBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int?>("PavilionId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Tags")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("Width")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -201,14 +253,28 @@ namespace Expo.Infrastructure.Migrations
 
                     b.HasIndex("PavilionId");
 
-                    b.ToTable("Stands", t =>
-                        {
-                            t.Property("Length")
-                                .HasColumnName("Stand_Length");
+                    b.ToTable("Stands");
+                });
 
-                            t.Property("Width")
-                                .HasColumnName("Stand_Width");
-                        });
+            modelBuilder.Entity("Expo.Domain.Entities.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -407,6 +473,66 @@ namespace Expo.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("PavilionTags", b =>
+                {
+                    b.Property<int>("PavilionId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("PavilionId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("PavilionTags");
+                });
+
+            modelBuilder.Entity("StandTags", b =>
+                {
+                    b.Property<int>("StandId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("StandId", "TagId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("StandTags");
+                });
+
+            modelBuilder.Entity("CategoryTags", b =>
+                {
+                    b.HasOne("Expo.Domain.Entities.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Expo.Domain.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ExhibitionAreaTags", b =>
+                {
+                    b.HasOne("Expo.Domain.Entities.ExhibitionArea", null)
+                        .WithMany()
+                        .HasForeignKey("ExhibitionAreaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Expo.Domain.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Expo.Domain.Entities.Stand", b =>
                 {
                     b.HasOne("Expo.Domain.Entities.ExhibitionArea", "ExhibitionArea")
@@ -425,10 +551,12 @@ namespace Expo.Infrastructure.Migrations
                                 .HasColumnType("integer");
 
                             b1.Property<int>("Length")
+                                .HasPrecision(18, 2)
                                 .HasColumnType("integer")
                                 .HasColumnName("Length");
 
                             b1.Property<int>("Width")
+                                .HasPrecision(18, 2)
                                 .HasColumnType("integer")
                                 .HasColumnName("Width");
 
@@ -495,6 +623,36 @@ namespace Expo.Infrastructure.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PavilionTags", b =>
+                {
+                    b.HasOne("Expo.Domain.Entities.Pavilion", null)
+                        .WithMany()
+                        .HasForeignKey("PavilionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Expo.Domain.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("StandTags", b =>
+                {
+                    b.HasOne("Expo.Domain.Entities.Stand", null)
+                        .WithMany()
+                        .HasForeignKey("StandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Expo.Domain.Entities.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

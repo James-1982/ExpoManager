@@ -19,12 +19,11 @@ namespace Expo.API.Controllers.Database;
 [ApiVersion(ApiConstants.V1)]
 public class CategoryController(
     ILogger<CategoryController> logger,
-    ICategoryService service) : ControllerBase
+    ICategoryService service) : BaseController(logger)
 {
-    private readonly ILogger<CategoryController> _logger = logger;
     private readonly ICategoryService _service = service;
 
-    #region CRUD Endpoints
+    #region CRUD
 
     /// <summary>
     /// Get all 'Categories'
@@ -34,16 +33,9 @@ public class CategoryController(
     [AllowAnonymous]
     public async Task<IActionResult> GetAll()
     {
-        try
-        {
-            var result = await _service.GetAllAsync(this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching all categories");
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+              () => _service.GetAllAsync(this.GetBaseUrl()),
+              "fetching all categories");
     }
 
     /// <summary>
@@ -54,16 +46,9 @@ public class CategoryController(
     [AllowAnonymous]
     public async Task<IActionResult> Get(int id)
     {
-        try
-        {
-            var result = await _service.GetByIdAsync(id, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error fetching category with id {CategoryId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            () => _service.GetByIdAsync(id, this.GetBaseUrl()),
+            $"fetching category {id}");
     }
 
     /// <summary>
@@ -72,21 +57,11 @@ public class CategoryController(
     [HttpPost]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanCreateEntity)]
-    public async Task<IActionResult> Create([FromBody] CategoryInDto model)
+    public async Task<IActionResult> Create([FromBody] CategoryInDto dto)
     {
-        try
-        {
-            var result = await _service.CreateAsync(model, this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? CreatedAtAction(nameof(Get), new { id = result.Value.Id }, result.Value)
-                : this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating category");
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.CreateAsync(dto, this.GetBaseUrl()),
+            $"creating category {dto.Name}");
     }
 
     /// <summary>
@@ -95,18 +70,11 @@ public class CategoryController(
     [HttpPut("{id}")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    public async Task<IActionResult> Update(int id, [FromBody] CategoryInDto model)
+    public async Task<IActionResult> Update(int id, [FromBody] CategoryInDto dto)
     {
-        try
-        {
-            var result = await _service.UpdateAsync(id, model, this.GetBaseUrl());
-            return this.ToActionResult(result);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating category with id {CategoryId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleServiceCall(
+            async () => await _service.UpdateAsync(id, dto, this.GetBaseUrl()),
+            $"updating category {dto.Name}");
     }
 
     /// <summary>
@@ -122,6 +90,7 @@ public class CategoryController(
             _service.DeleteAsync(id); // Async fire-and-forget
 
             _logger.LogInformation("Scheduled deletion for category {CategoryId}", id);
+
             return Accepted();
         }
         catch (Exception ex)
@@ -141,34 +110,18 @@ public class CategoryController(
     [HttpPost("{id}/image")]
     [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    public async Task<IActionResult> UploadImage(int id, IFormFile? immagine)
+    public async Task<IActionResult> UploadImage(int id, IFormFile? image)
     {
-        if (immagine == null)
+        if (image == null)
         {
-            const string msg = "Empty image";
+            string msg = "Empty image";
             _logger.LogError(msg);
             return BadRequest(msg);
         }
 
-        try
-        {
-            var result = await _service.UploadImageAsync(
-                id,
-                immagine.OpenReadStream(),
-                immagine.FileName,
-                this.GetBaseUrl());
-
-            return result.IsSuccess
-                ? Ok(result.Value)
-                : result.Errors.Any(e => e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
-                    ? NotFound(result.Errors.First().Message)
-                    : BadRequest(result.Errors.First().Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error uploading image for category {CategoryId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleImageUpload(
+        () => _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
+        "Category", id);
     }
 
     /// <summary>
@@ -179,21 +132,10 @@ public class CategoryController(
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
     public async Task<IActionResult> DeleteImage(int id)
     {
-        try
-        {
-            var result = await _service.DeleteImageAsync(id);
-
-            return result.IsSuccess
-                ? Ok()
-                : result.Errors.Any(e => e.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
-                    ? NotFound(result.Errors.First().Message)
-                    : BadRequest(result.Errors.First().Message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error deleting image for category {CategoryId}", id);
-            return Problem(ex.Message);
-        }
+        return await HandleImageDelete(
+            () => _service.DeleteImageAsync(id),
+            "Category",
+            id);
     }
 
     #endregion

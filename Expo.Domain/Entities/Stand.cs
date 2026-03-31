@@ -50,10 +50,10 @@ public class Stand : BaseEntity
 
     public void UpdateDimensions(int? width, int? length)
     {
-        if (width.HasValue && width > 0)
+        if (width.HasValue)
             Dimensions.UpdateWidth(width.Value);
 
-        if (length.HasValue && length > 0)
+        if (length.HasValue)
             Dimensions.UpdateLength(length.Value);
     }
 }

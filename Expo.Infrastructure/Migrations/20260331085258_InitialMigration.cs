@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Expo.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,10 +58,11 @@ namespace Expo.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IsHighlighted = table.Column<bool>(type: "boolean", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ImagePath = table.Column<string>(type: "text", nullable: true),
-                    Tags = table.Column<string>(type: "text", nullable: false)
+                    LastModify = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifyBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -74,13 +75,14 @@ namespace Expo.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Type = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    State = table.Column<int>(type: "integer", maxLength: 100, nullable: false),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    State = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     IsHighlighted = table.Column<bool>(type: "boolean", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ImagePath = table.Column<string>(type: "text", nullable: true),
-                    Tags = table.Column<string>(type: "text", nullable: false)
+                    LastModify = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifyBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -95,10 +97,11 @@ namespace Expo.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Area = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     PoweredBy = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ImagePath = table.Column<string>(type: "text", nullable: true),
-                    Tags = table.Column<string>(type: "text", nullable: false)
+                    LastModify = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifyBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -111,7 +114,7 @@ namespace Expo.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Token = table.Column<string>(type: "text", nullable: false),
+                    Token = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     UserId = table.Column<string>(type: "text", nullable: false),
                     Expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -120,6 +123,19 @@ namespace Expo.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -234,16 +250,15 @@ namespace Expo.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Width = table.Column<int>(type: "integer", nullable: false),
-                    Length = table.Column<int>(type: "integer", nullable: false),
-                    Stand_Width = table.Column<int>(type: "integer", nullable: true),
-                    Stand_Length = table.Column<int>(type: "integer", nullable: true),
+                    Width = table.Column<int>(type: "integer", precision: 18, scale: 2, nullable: false),
+                    Length = table.Column<int>(type: "integer", precision: 18, scale: 2, nullable: false),
                     PavilionId = table.Column<int>(type: "integer", nullable: true),
                     ExhibitionAreaId = table.Column<int>(type: "integer", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
                     ImagePath = table.Column<string>(type: "text", nullable: true),
-                    Tags = table.Column<string>(type: "text", nullable: false)
+                    LastModify = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ModifyBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -260,6 +275,102 @@ namespace Expo.Infrastructure.Migrations
                         principalTable: "Pavilions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CategoryTags",
+                columns: table => new
+                {
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
+                    TagId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoryTags", x => new { x.CategoryId, x.TagId });
+                    table.ForeignKey(
+                        name: "FK_CategoryTags_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CategoryTags_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExhibitionAreaTags",
+                columns: table => new
+                {
+                    ExhibitionAreaId = table.Column<int>(type: "integer", nullable: false),
+                    TagId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExhibitionAreaTags", x => new { x.ExhibitionAreaId, x.TagId });
+                    table.ForeignKey(
+                        name: "FK_ExhibitionAreaTags_ExhibitionAreas_ExhibitionAreaId",
+                        column: x => x.ExhibitionAreaId,
+                        principalTable: "ExhibitionAreas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExhibitionAreaTags_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PavilionTags",
+                columns: table => new
+                {
+                    PavilionId = table.Column<int>(type: "integer", nullable: false),
+                    TagId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PavilionTags", x => new { x.PavilionId, x.TagId });
+                    table.ForeignKey(
+                        name: "FK_PavilionTags_Pavilions_PavilionId",
+                        column: x => x.PavilionId,
+                        principalTable: "Pavilions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PavilionTags_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StandTags",
+                columns: table => new
+                {
+                    StandId = table.Column<int>(type: "integer", nullable: false),
+                    TagId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StandTags", x => new { x.StandId, x.TagId });
+                    table.ForeignKey(
+                        name: "FK_StandTags_Stands_StandId",
+                        column: x => x.StandId,
+                        principalTable: "Stands",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StandTags_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -300,6 +411,39 @@ namespace Expo.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Categories_Name",
+                table: "Categories",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CategoryTags_TagId",
+                table: "CategoryTags",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExhibitionAreas_Name",
+                table: "ExhibitionAreas",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExhibitionAreaTags_TagId",
+                table: "ExhibitionAreaTags",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pavilions_Name",
+                table: "Pavilions",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PavilionTags_TagId",
+                table: "PavilionTags",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_Token",
                 table: "RefreshTokens",
                 column: "Token",
@@ -314,6 +458,17 @@ namespace Expo.Infrastructure.Migrations
                 name: "IX_Stands_PavilionId",
                 table: "Stands",
                 column: "PavilionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StandTags_TagId",
+                table: "StandTags",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_Name",
+                table: "Tags",
+                column: "Name",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -335,19 +490,34 @@ namespace Expo.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "CategoryTags");
+
+            migrationBuilder.DropTable(
+                name: "ExhibitionAreaTags");
+
+            migrationBuilder.DropTable(
+                name: "PavilionTags");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "Stands");
+                name: "StandTags");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Stands");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "ExhibitionAreas");

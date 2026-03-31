@@ -11,6 +11,7 @@ internal class PavilionService(
     IMapper mapper,
     IImageService imageService,
     IBackgroundJobClient backgroundJobClient,
+    ICurrentUserService currentUser,
     IUnitOfWork uow) : IPavilionService
 {
     private readonly ILogger<PavilionService> _logger = logger;
@@ -18,12 +19,12 @@ internal class PavilionService(
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _uow = uow;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
-
+    private readonly ICurrentUserService _currentUser = currentUser;
     public async Task<Result<IList<PavilionOutDto>>> GetAllAsync(string baseUrl)
     {
         _logger.LogInformation("Fetching all pavilions");
 
-        var entities = await _uow.Pavilions.GetAllAsync();
+        var entities = await _uow.Pavilions.GetAllWithRelationsAsync();
         if (entities == null || !entities.Any())
             return Result.Fail<IList<PavilionOutDto>>("No data found");
 
@@ -31,12 +32,12 @@ internal class PavilionService(
                           .AddParameters("BaseUrl", baseUrl)
                           .AdaptToType<List<PavilionOutDto>>();
 
-        return Result.Ok<IList<PavilionOutDto>>(dtos as IList<PavilionOutDto>);
+        return Result.Ok<IList<PavilionOutDto>>(dtos);
     }
 
     public async Task<Result<PavilionOutDto>> GetByIdAsync(int id, string baseUrl)
     {
-        var entity = await _uow.Pavilions.GetByIdAsync(id);
+        var entity = await _uow.Pavilions.GetWithRelationsAsync(id);
         if (entity == null)
             return Result.Fail<PavilionOutDto>($"Pavilion {id} not found");
 
@@ -52,6 +53,9 @@ internal class PavilionService(
         try
         {
             var entity = _mapper.Map<Pavilion>(dto);
+            var tags = await _uow.Tags.GetOrCreateTagsAsync(dto.Tags);
+            entity.AddTags(tags);
+            entity.SetAuditInfo(_currentUser.UserName);
             await _uow.Pavilions.AddAsync(entity);
             await _uow.SaveAsync();
 
@@ -71,11 +75,20 @@ internal class PavilionService(
     {
         try
         {
-            var entity = await _uow.Pavilions.GetByIdAsync(id);
+            var entity = await _uow.Pavilions.GetWithRelationsAsync(id);
             if (entity == null)
-                return Result.Fail<PavilionOutDto>($"Pavilion {id} not found");
+            {
+                var msg = $"Pavilion {id} not found";
+                _logger.LogWarning(msg);
+                return Result.Fail<PavilionOutDto>(msg);
+            }
 
             _mapper.Map(dto, entity);
+
+            await entity.Tags.UpdateEntityTagsAsync(dto.Tags, _uow);
+            entity.SetAuditInfo(_currentUser.UserName);
+            uow.Pavilions.Update(entity);
+
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
@@ -137,7 +150,8 @@ internal class PavilionService(
 
         if (result.IsFailed) return Result.Fail<string>(result.Errors.First().Message);
 
-        entity.UpdateImmaginePath(result.Value);
+        entity.SetAuditInfo(_currentUser.UserName);
+        entity.UpdateImagePath(result.Value);
         await _uow.SaveAsync();
 
         var url = $"{baseUrl}/{_imageService.ImagesFolder}/{entity.ImagePath}";
@@ -155,7 +169,7 @@ internal class PavilionService(
         if (!string.IsNullOrEmpty(entity.ImagePath))
             await _imageService.DeleteImageAsync(entity.ImagePath);
 
-        entity.UpdateImmaginePath(null);
+        entity.UpdateImagePath(null);
         await _uow.SaveAsync();
 
         _logger.LogInformation($"Image deleted for pavilion {id}");

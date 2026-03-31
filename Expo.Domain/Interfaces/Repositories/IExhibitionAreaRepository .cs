@@ -12,13 +12,13 @@ public interface IExhibitionAreaRepository : IRepository<ExhibitionArea>
     /// </summary>
     /// <param name="id">ExhibitionArea id</param>
     /// <returns>ExhibitionArea entity or null if not found</returns>
-    Task<ExhibitionArea?> GetWithStandsAsync(int id);
+    Task<ExhibitionArea?> GetWithRelationsAsync(int id);
 
     /// <summary>
     /// Get all ExhibitionAreas including their related stands
     /// </summary>
     /// <returns>Enumerable of ExhibitionArea entities</returns>
-    Task<IEnumerable<ExhibitionArea>> GetAllWithStandsAsync();
+    Task<IEnumerable<ExhibitionArea>> GetAllWithRelationsAsync();
 
     /// <summary>
     /// Count the number of stands assigned to a given ExhibitionArea

@@ -47,7 +47,7 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddValidators(); // Aggiunge tutti i validator
 builder.Services.AddFluentValidationAutoValidation(o => o.DisableDataAnnotationsValidation = true);
-
+builder.Services.AddHttpContextAccessor();
 // --------------------------------------------------
 // API VERSIONING
 // --------------------------------------------------

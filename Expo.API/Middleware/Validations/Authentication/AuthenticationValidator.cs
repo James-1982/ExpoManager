@@ -77,19 +77,15 @@ public class RegisterUserValidator : AbstractValidator<RegisterUserDto>
         RuleFor(x => x.Role)
             .NotEmpty()
             .NotNull()
-            .WithMessage("Role can not be null or empty")
+            .WithMessage("Role cannot be null or empty")
             .Must(BeAValidRole).WithMessage("Inserted role is not valid");
     }
 
     private bool BeAValidRole(string? roleName)
     {
-        if (string.IsNullOrWhiteSpace(roleName))
-            return false;
-
-        return Enum.TryParse<Role>(roleName, true, out _);
+        return !string.IsNullOrWhiteSpace(roleName) && Enum.TryParse<Role>(roleName, true, out _);
     }
 }
-
 
 public class ChangeRoleValidator : AbstractValidator<ChangeRoleDto>
 {
@@ -103,9 +99,6 @@ public class ChangeRoleValidator : AbstractValidator<ChangeRoleDto>
 
     private bool BeAValidRole(string? roleName)
     {
-        if (string.IsNullOrWhiteSpace(roleName))
-            return false;
-
-        return Enum.TryParse<Role>(roleName, true, out _);
+        return !string.IsNullOrWhiteSpace(roleName) && Enum.TryParse<Role>(roleName, true, out _);
     }
 }

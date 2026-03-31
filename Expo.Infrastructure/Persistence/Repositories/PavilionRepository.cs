@@ -10,26 +10,19 @@ namespace Expo.Infrastructure.Persistence.Repositories;
 /// <param name="context">Application DB context</param>
 public class PavilionRepository(ApplicationDbContext context) : Repository<Pavilion>(context), IPavilionRepository
 {
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public async Task<Pavilion?> GetWithStandsAsync(int id)
+    public async Task<Pavilion?> GetWithRelationsAsync(int id)
     {
         return await _context.Pavilions
-                             .Include(p => p.Stands)
-                             .FirstOrDefaultAsync(p => p.Id == id);
+            .Include(p => p.Tags)
+            .Include(p => p.Stands)
+            .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public async Task<IEnumerable<Pavilion>> GetAllWithStandsAsync()
+    public async Task<IEnumerable<Pavilion>> GetAllWithRelationsAsync()
     {
         return await _context.Pavilions
-                             .Include(p => p.Stands)
-                             .ToListAsync();
+            .Include(p => p.Tags)
+            .Include(p => p.Stands)
+            .ToListAsync();
     }
 }

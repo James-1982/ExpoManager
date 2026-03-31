@@ -13,6 +13,7 @@ internal class CategoryService(
     IMapper mapper,
     IImageService imageService,
     IBackgroundJobClient backgroundJobClient,
+    ICurrentUserService currentUser,
     IUnitOfWork uow) : ICategoryService
 {
     #region Fields
@@ -22,6 +23,7 @@ internal class CategoryService(
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _uow = uow;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+    private readonly ICurrentUserService _currentUser = currentUser;
 
     #endregion
 
@@ -29,7 +31,7 @@ internal class CategoryService(
     {
         _logger.LogInformation("Fetching all categories");
 
-        var entities = await _uow.Categories.GetAllAsync();
+        var entities = await _uow.Categories.GetAllWithRelationsAsync();
         if (entities == null || !entities.Any())
             return Result.Fail<IList<CategoryOutDto>>("No data found");
 
@@ -42,9 +44,12 @@ internal class CategoryService(
 
     public async Task<Result<CategoryOutDto>> GetByIdAsync(int id, string baseUrl)
     {
-        var entity = await _uow.Categories.GetByIdAsync(id);
+        var entity = await _uow.Categories.GetWithRelationsAsync(id);
         if (entity == null)
+        {
+            _logger.LogInformation($"Category {id} not found");
             return Result.Fail<CategoryOutDto>($"Category {id} not found");
+        }
 
         var dto = _mapper.From(entity)
                          .AddParameters("BaseUrl", baseUrl)
@@ -58,6 +63,9 @@ internal class CategoryService(
         try
         {
             var entity = _mapper.Map<Category>(dto);
+            var tags = await _uow.Tags.GetOrCreateTagsAsync(dto.Tags);
+            entity.AddTags(tags);
+            entity.SetAuditInfo(_currentUser.UserName);
             await _uow.Categories.AddAsync(entity);
             await _uow.SaveAsync();
 
@@ -77,11 +85,20 @@ internal class CategoryService(
     {
         try
         {
-            var entity = await _uow.Categories.GetByIdAsync(id);
+            var entity = await _uow.Categories.GetWithRelationsAsync(id);
             if (entity == null)
-                return Result.Fail<CategoryOutDto>($"Category {id} not found");
+            {
+                var msg = $"Category {id} not found";
+                _logger.LogWarning(msg);
+                return Result.Fail<CategoryOutDto>(msg);
+            }
 
             _mapper.Map(dto, entity);
+
+            await entity.Tags.UpdateEntityTagsAsync(dto.Tags, _uow);
+            entity.SetAuditInfo(_currentUser.UserName);
+            _uow.Categories.Update(entity);
+
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
@@ -143,7 +160,8 @@ internal class CategoryService(
         if (!result.IsSuccess)
             return Result.Fail<string>(result.Errors);
 
-        entity.UpdateImmaginePath(result.Value);
+        entity.SetAuditInfo(_currentUser.UserName);
+        entity.UpdateImagePath(result.Value);
         await _uow.SaveAsync();
 
         var url = $"{baseUrl}/{_imageService.ImagesFolder}/{entity.ImagePath}";
@@ -161,7 +179,7 @@ internal class CategoryService(
         if (!string.IsNullOrEmpty(entity.ImagePath))
             await _imageService.DeleteImageAsync(entity.ImagePath);
 
-        entity.UpdateImmaginePath(null);
+        entity.UpdateImagePath(null);
         await _uow.SaveAsync();
 
         _logger.LogInformation($"Image deleted for category {id}");

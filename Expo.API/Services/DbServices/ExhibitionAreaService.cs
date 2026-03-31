@@ -16,6 +16,7 @@ internal class ExhibitionAreaService(
     IMapper mapper,
     IImageService imageService,
     IBackgroundJobClient backgroundJobClient,
+    ICurrentUserService currentUser,
     IUnitOfWork uow) : IExhibitionAreaService
 {
     private readonly ILogger<ExhibitionAreaService> _logger = logger;
@@ -23,12 +24,14 @@ internal class ExhibitionAreaService(
     private readonly IMapper _mapper = mapper;
     private readonly IUnitOfWork _uow = uow;
     private readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
+    private readonly ICurrentUserService _currentUser = currentUser;
 
     public async Task<Result<IList<ExhibitionAreaOutDto>>> GetAllAsync(string baseUrl)
     {
         _logger.LogInformation("Fetching all sectors");
 
-        var entities = await _uow.ExhibitionHalls.GetAllWithStandsAsync();
+        var entities = await _uow.ExhibitionAreas.GetAllWithRelationsAsync();
+
         if (entities == null || !entities.Any())
             return Result.Fail<IList<ExhibitionAreaOutDto>>("No data found");
 
@@ -41,7 +44,7 @@ internal class ExhibitionAreaService(
 
     public async Task<Result<ExhibitionAreaOutDto>> GetByIdAsync(int id, string baseUrl)
     {
-        var entity = await _uow.ExhibitionHalls.GetWithStandsAsync(id);
+        var entity = await _uow.ExhibitionAreas.GetWithRelationsAsync(id);
         if (entity == null)
         {
             _logger.LogInformation($"Sector {id} not found");
@@ -60,7 +63,10 @@ internal class ExhibitionAreaService(
         try
         {
             var entity = _mapper.Map<ExhibitionArea>(dto);
-            await _uow.ExhibitionHalls.AddAsync(entity);
+            var tags = await _uow.Tags.GetOrCreateTagsAsync(dto.Tags);
+            entity.AddTags(tags);
+            entity.SetAuditInfo(_currentUser.UserName);
+            await _uow.ExhibitionAreas.AddAsync(entity);
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
@@ -79,7 +85,7 @@ internal class ExhibitionAreaService(
     {
         try
         {
-            var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
+            var entity = await _uow.ExhibitionAreas.GetWithRelationsAsync(id);
             if (entity == null)
             {
                 var msg = $"Sector {id} not found";
@@ -88,6 +94,11 @@ internal class ExhibitionAreaService(
             }
 
             _mapper.Map(dto, entity);
+
+            await entity.Tags.UpdateEntityTagsAsync(dto.Tags, _uow);
+            entity.SetAuditInfo(_currentUser.UserName);
+            _uow.ExhibitionAreas.Update(entity);
+
             await _uow.SaveAsync();
 
             var outDto = _mapper.From(entity)
@@ -110,13 +121,13 @@ internal class ExhibitionAreaService(
 
     public async Task DeleteJob(int id)
     {
-        var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
+        var entity = await _uow.ExhibitionAreas.GetByIdAsync(id);
         if (entity == null)
             return;
 
         var imagePath = entity.ImagePath; // salva il path prima della cancellazione
 
-        _uow.ExhibitionHalls.Remove(entity);
+        _uow.ExhibitionAreas.Remove(entity);
         await _uow.SaveAsync();
 
         if (!string.IsNullOrEmpty(imagePath))
@@ -137,7 +148,7 @@ internal class ExhibitionAreaService(
             return Result.Fail<string>(msg);
         }
 
-        var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
+        var entity = await _uow.ExhibitionAreas.GetByIdAsync(id);
         if (entity == null)
         {
             var msg = $"Sector {id} not found";
@@ -156,7 +167,8 @@ internal class ExhibitionAreaService(
 
         if (result.IsSuccess)
         {
-            entity.UpdateImmaginePath(result.Value);
+            entity.UpdateImagePath(result.Value);
+            entity.SetAuditInfo(_currentUser.UserName);
             await _uow.SaveAsync();
 
             var url = $"{baseUrl}/{_imageService.ImagesFolder}/{entity.ImagePath}";
@@ -170,7 +182,7 @@ internal class ExhibitionAreaService(
 
     public async Task<Result<bool>> DeleteImageAsync(int id)
     {
-        var entity = await _uow.ExhibitionHalls.GetByIdAsync(id);
+        var entity = await _uow.ExhibitionAreas.GetByIdAsync(id);
         if (entity == null)
         {
             _logger.LogWarning($"Sector {id} not found");
@@ -180,7 +192,7 @@ internal class ExhibitionAreaService(
         if (!string.IsNullOrEmpty(entity.ImagePath))
             await _imageService.DeleteImageAsync(entity.ImagePath);
 
-        entity.UpdateImmaginePath(null);
+        entity.UpdateImagePath(null);
         await _uow.SaveAsync();
 
         _logger.LogInformation($"Image deleted for sector {id}");
