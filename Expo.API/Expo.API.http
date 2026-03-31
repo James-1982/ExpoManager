@@ -1,19 +1,39 @@
 @Expo.API_HostAddress = http://localhost:5075
 
 #################################################
+# AUTH
+#################################################
+
+### Login
+POST {{Expo.API_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@expo.com",
+  "password": "Admin123!!"
+}
+
+# Salva il token in variabile Postman
+Tests:
+pm.environment.set("token", pm.response.json().token);
+
+#################################################
 # USERS
 #################################################
 
 ### Get all users
 GET {{Expo.API_HostAddress}}/api/v1/users
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get user by id
 GET {{Expo.API_HostAddress}}/api/v1/users/{{userId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create user
 POST {{Expo.API_HostAddress}}/api/v1/users
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -24,6 +44,7 @@ Content-Type: application/json
 
 ### Promote user
 POST {{Expo.API_HostAddress}}/api/v1/users/{{userId}}/promote
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -32,6 +53,7 @@ Content-Type: application/json
 
 ### Demote user
 POST {{Expo.API_HostAddress}}/api/v1/users/{{userId}}/demote
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -44,14 +66,17 @@ Content-Type: application/json
 
 ### Get all pavilions
 GET {{Expo.API_HostAddress}}/api/v1/pavilions
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get pavilion by id
 GET {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create pavilion
 POST {{Expo.API_HostAddress}}/api/v1/pavilions
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -63,6 +88,7 @@ Content-Type: application/json
 
 ### Update pavilion
 PUT {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -72,14 +98,9 @@ Content-Type: application/json
   "tags": ["innovation","expo"]
 }
 
-### Upload pavilion image
-POST {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}/image
-Content-Type: multipart/form-data
-
-immagine=@pavilion.png
-
-### Delete pavilion image
-DELETE {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}/image
+### Delete pavilion
+DELETE {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}
+Authorization: Bearer {{token}}
 
 #################################################
 # EXHIBITION AREAS
@@ -87,42 +108,41 @@ DELETE {{Expo.API_HostAddress}}/api/v1/pavilions/{{pavilionId}}/image
 
 ### Get all exhibition areas
 GET {{Expo.API_HostAddress}}/api/v1/exhibitionareas
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get exhibition area by id
 GET {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create exhibition area
 POST {{Expo.API_HostAddress}}/api/v1/exhibitionareas
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "Hall 1",
-  "type": "Tech",
+  "type": "Room",
   "state": "Active",
   "tags": ["ai","vr"]
 }
 
 ### Update exhibition area
 PUT {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "Hall 1 Updated",
-  "type": "Tech",
+  "type": "Room",
   "state": "Active",
   "tags": ["ai","innovation"]
 }
 
-### Upload exhibition area image
-POST {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}/image
-Content-Type: multipart/form-data
-
-immagine=@hall.png
-
-### Delete exhibition area image
-DELETE {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}/image
+### Delete exhibition area
+DELETE {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}
+Authorization: Bearer {{token}}
 
 #################################################
 # STANDS
@@ -130,52 +150,49 @@ DELETE {{Expo.API_HostAddress}}/api/v1/exhibitionareas/{{areaId}}/image
 
 ### Get all stands
 GET {{Expo.API_HostAddress}}/api/v1/stands
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get stand by id
 GET {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create stand
 POST {{Expo.API_HostAddress}}/api/v1/stands
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "Stand 101",
-  "dimensions": {
-    "Width": 3,
-    "Length": 4,
-    "Height": 2.5
-  },
+  "width": 3,
+  "length": 4,
+  "height": 2.5,
   "pavilionId": 1,
   "exhibitionAreaId": 2,
-  "tags": ["tech","startup"]
+  "tags": ["tech","startup"],
+  "categoryIds": [1]
 }
 
 ### Update stand
 PUT {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "name": "Stand 101 Updated",
-  "dimensions": {
-    "Width": 3,
-    "Length": 4,
-    "Height": 2.5
-  },
+  "width": 3,
+  "length": 4,
+  "height": 2.5,
   "pavilionId": 1,
   "exhibitionAreaId": 2,
-  "tags": ["innovation","expo"]
+  "tags": ["innovation","expo"],
+  "categoryIds": [1]
 }
 
-### Upload stand image
-POST {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}/image
-Content-Type: multipart/form-data
-
-immagine=@stand.png
-
-### Delete stand image
-DELETE {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}/image
+### Delete stand
+DELETE {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}
+Authorization: Bearer {{token}}
 
 #################################################
 # CATEGORIES
@@ -183,14 +200,17 @@ DELETE {{Expo.API_HostAddress}}/api/v1/stands/{{standId}}/image
 
 ### Get all categories
 GET {{Expo.API_HostAddress}}/api/v1/categories
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get category by id
 GET {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create category
 POST {{Expo.API_HostAddress}}/api/v1/categories
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -201,6 +221,7 @@ Content-Type: application/json
 
 ### Update category
 PUT {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -209,11 +230,6 @@ Content-Type: application/json
   "tags": ["ai","innovation"]
 }
 
-### Upload category image
-POST {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}/image
-Content-Type: multipart/form-data
-
-immagine=@category.png
-
-### Delete category image
-DELETE {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}/image
+### Delete category
+DELETE {{Expo.API_HostAddress}}/api/v1/categories/{{categoryId}}
+Authorization: Bearer {{token}}
