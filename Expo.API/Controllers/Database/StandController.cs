@@ -23,6 +23,8 @@ public class StandController(
 {
     private readonly IStandService _service = service;
 
+    #region CRUD
+
     /// <summary>
     /// Get all 'Stand'
     /// </summary>
@@ -86,43 +88,7 @@ public class StandController(
             async () => await _service.UpdateAsync(id, dto, this.GetBaseUrl()),
             $"updating stand {dto.Name}");
     }
-    /// <summary>
-    /// Upload a new image for an exisiting 'Stand'
-    /// </summary>
-    /// <param name="id">'Stand' Id</param>
-    /// <param name="image">Image file</param>
-    /// <returns>URL of uploaded image</returns>
-    [HttpPost("{id}/image")]
-    [MapToApiVersion(ApiConstants.V1)]
-    [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UploadImage(int id, IFormFile? image)
-    {
-        if (image == null)
-            return BadRequest("Empty image");
 
-        return await HandleServiceCall(
-            async () => await _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
-            $"uploading image for stand {id}");
-    }
-    /// <summary>
-    /// Delete an image linked to an exisitng 'Stand'
-    /// </summary>
-    /// <param name="id">'Stand' Id</param>
-    /// <returns>Status</returns>
-    [HttpDelete("{id}/image")]
-    [MapToApiVersion(ApiConstants.V1)]
-    [Authorize(Policy = Policy.Entity.CanDeleteEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteImage(int id)
-    {
-        return await HandleServiceCall(
-            async () => await _service.DeleteImageAsync(id),
-            $"deleting image for stand {id}");
-    }
     /// <summary>
     /// Request a delete operation to an exisitng 'Stand'
     /// </summary>
@@ -137,4 +103,48 @@ public class StandController(
         _service.DeleteAsync(id); // fire-and-forget
         return Accepted();
     }
+
+    #endregion
+
+    #region Image Endpoints
+
+    /// <summary>
+    /// Upload a new image for an existing 'Stand'
+    /// </summary>
+    [HttpPost("{id}/image")]
+    [MapToApiVersion(ApiConstants.V1)]
+    [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
+    public async Task<IActionResult> UploadImage(int id, IFormFile? image)
+    {
+        if (image == null)
+        {
+            string msg = "Empty image";
+            Logger.LogError(msg);
+            return BadRequest(msg);
+        }
+
+        return await HandleImageUpload(
+            () => _service.UploadImageAsync(
+                id,
+                image.OpenReadStream(),
+                image.FileName,
+                this.GetBaseUrl()),
+                "Stand", id);
+    }
+
+    /// <summary>
+    /// Delete an image linked to an existing 'Stand'
+    /// </summary>
+    [HttpDelete("{id}/image")]
+    [MapToApiVersion(ApiConstants.V1)]
+    [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
+    public async Task<IActionResult> DeleteImage(int id)
+    {
+        return await HandleImageDelete(
+            () => _service.DeleteImageAsync(id),
+            "Stand",
+            id);
+    }
+
+    #endregion
 }

@@ -4,7 +4,6 @@ using Expo.API.Utils;
 using Expo.Application.DTO.DB;
 using Expo.Application.DTO.User;
 using Expo.Application.Interfaces.Services;
-using Expo.Domain.Constants;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -35,9 +34,8 @@ internal static class AuthEndpoints
 public class AuthenticationController(
     ILogger<AuthenticationController> logger,
     IMapper mapper,
-    IAuthenticationService authService) : ControllerBase
+    IAuthenticationService authService) : BaseController(logger)
 {
-    private readonly ILogger<AuthenticationController> _logger = logger;
     private readonly IMapper _mapper = mapper;
     private readonly IAuthenticationService _authService = authService;
 
@@ -56,10 +54,9 @@ public class AuthenticationController(
           .AddParameters("BaseUrl", this.GetBaseUrl())
           .AdaptToType<RegisterUserDto>();
 
-        model.Role = RoleHierarchy.GetRoleName(Role.Supervisor);
-
         // Passa base URL senza email e token
         var baseUrl = $"{this.GetApiVersionBaseUrl()}/{this.ControllerContext.ActionDescriptor.ControllerName.ToLower()}/{AuthEndpoints.ConfirmRegistration}";
+
         var result = await _authService.RegisterAsync(model, baseUrl);
 
         return result.IsSuccess
@@ -97,18 +94,17 @@ public class AuthenticationController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
     {
-        _logger.LogInformation("Attempting login");
-
+        Logger.LogInformation("Attempting login");
 
         var tokenResult = await _authService.LoginAsync(model);
 
         if (tokenResult.IsFailed)
         {
-            _logger.LogWarning(tokenResult.Errors[0].Message);
+            Logger.LogWarning(tokenResult.Errors[0].Message);
             return Unauthorized(new { message = $"Invalid credentials for user {model.Email}" });
         }
 
-        _logger.LogInformation($"User logged in successfully: {model.Email}");
+        Logger.LogInformation($"User logged in successfully: {model.Email}");
 
         return Ok(new
         {
@@ -163,7 +159,7 @@ public class AuthenticationController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> ForgotPassword([FromBody] EmailDto model)
     {
-        _logger.LogInformation($"Password reset requested for user: {model.Email}");
+        Logger.LogInformation($"Password reset requested for user: {model.Email}");
 
         // Passa base URL senza email e token
         var baseUrl = $"{this.GetBaseUrl()}/reset-password.html?version={this.GetApiVersionNumber()}";
@@ -172,11 +168,11 @@ public class AuthenticationController(
 
         if (result.IsFailed)
         {
-            _logger.LogWarning($"Password reset failed");
+            Logger.LogWarning($"Password reset failed");
             return Ok();
         }
 
-        _logger.LogInformation($"Password reset link sent to: {model.Email}");
+        Logger.LogInformation($"Password reset link sent to: {model.Email}");
         return Ok("Check your email to reset password.");
     }
 
@@ -191,7 +187,7 @@ public class AuthenticationController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto model)
     {
-        _logger.LogInformation($"Resetting password for user: {model.Email}");
+        Logger.LogInformation($"Resetting password for user: {model.Email}");
 
         // Decodifica il token da Base64Url
         var tokenBytes = WebEncoders.Base64UrlDecode(model.Token);
@@ -201,11 +197,11 @@ public class AuthenticationController(
 
         if (result.IsFailed)
         {
-            _logger.LogWarning($"Password reset failed for user: {model.Email}");
+            Logger.LogWarning($"Password reset failed for user: {model.Email}");
             return BadRequest(new { message = $"Password reset failed for user {model.Email}" });
         }
 
-        _logger.LogInformation($"Password reset successful for user: {model.Email}");
+        Logger.LogInformation($"Password reset successful for user: {model.Email}");
         return Ok(new { message = $"Password reset successful for user {model.Email}" });
     }
 }

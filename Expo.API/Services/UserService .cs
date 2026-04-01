@@ -161,15 +161,17 @@ internal class UserService : IUserService
 
     public async Task<Result<IList<UserDto>>> GetAllUsersAsync()
     {
-        var users = _userManager.Users.ToList();
-
-        var tasks = users.Select(async u => new UserDto
+        var list = new List<UserDto>();
+        foreach (var u in _userManager.Users)
         {
-            Id = u.Id,
-            Email = u.Email,
-            Roles = await _userManager.GetRolesAsync(u)
-        });
-
-        return Result.Ok((IList<UserDto>)(await Task.WhenAll(tasks)).ToList());
+            var roles = await _userManager.GetRolesAsync(u);
+            list.Add(new UserDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                Roles = roles
+            });
+        }
+        return Result.Ok<IList<UserDto>>(list);
     }
 }
