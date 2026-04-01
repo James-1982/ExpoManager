@@ -29,10 +29,11 @@ internal static class ServicesExtension
     /// <param name="configuration"></param>
     internal static void SetupInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionStrign = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionStrign)
-        );
+            options.UseNpgsql(connectionString,
+                o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPavilionRepository, PavilionRepository>();
@@ -44,7 +45,7 @@ internal static class ServicesExtension
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionStrign)));
+                .UsePostgreSqlStorage(options => options.UseNpgsqlConnection(connectionString)));
 
         services.AddHangfireServer();
     }
