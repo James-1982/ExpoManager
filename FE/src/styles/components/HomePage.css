@@ -1,0 +1,78 @@
+/* =========================
+   Tab Bar come gruppo unico
+   ========================= */
+/* =========================
+   Titolo principale centrato
+   ========================= */
+.home-container h1 {
+    text-align: center;
+    /* già c’era, ma assicuriamoci */
+    width: 100%;
+    /* prende tutta la larghezza */
+    margin-bottom: 2rem;
+}
+
+/* =========================
+   Placeholder centrato
+   ========================= */
+.empty-placeholder {
+    display: flex;
+    justify-content: center;
+    /* centrato orizzontalmente */
+    align-items: center;
+    /* centrato verticalmente */
+    text-align: center;
+    /* anche il testo dentro */
+    color: #aaa;
+    font-size: 1.2rem;
+    width: 100%;
+    padding: 2rem 0;
+}
+
+
+.tab-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    background-color: #333;
+    border-radius: 12px;
+    /* arrotondato esterni */
+    margin-bottom: 1rem;
+    overflow: hidden;
+    /* fa sì che i bordi arrotondati siano rispettati */
+}
+
+/* Tab singole, unite senza gap */
+.tab-bar .tab {
+    flex: 1;
+    /* tutte larghe uguali */
+    padding: 0.6rem 1.5rem;
+    cursor: pointer;
+    background-color: #555;
+    color: #fff;
+    font-size: 1rem;
+    text-align: center;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+/* Tab attiva */
+.tab-bar .tab.active {
+    background-color: var(--accent);
+    font-weight: bold;
+}
+
+/* Hover */
+.tab-bar .tab:hover {
+    background-color: #777;
+}
+
+/* Arrotondamento solo agli estremi */
+.tab-bar .tab:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.tab-bar .tab:last-child {
+    border-radius: 0 12px 12px 0;
+}

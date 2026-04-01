@@ -1,0 +1,28 @@
+/* Importa prima il CSS generico della CardBase */
+@import './CardBase.css';
+
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Nome del pavilion */
+.entity-name {
+    text-align: left;
+    /* cambiato da right a left */
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+
+/* Area e PoweredBy */
+.extra-field {
+    text-align: left;
+    /* cambiato da right a left */
+    font-size: 0.85rem;
+    color: #ccc;
+    margin-bottom: 0.2rem;
+}
