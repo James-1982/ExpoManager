@@ -199,4 +199,33 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.Lifetime.ApplicationStarted.Register(async () =>
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+    await db.Pavilions
+        .AsNoTracking()
+        .OrderBy(p => p.Id)
+        .Select(p => p.Id)
+        .FirstOrDefaultAsync();
+    await db.ExhibitionAreas
+        .AsNoTracking()
+        .OrderBy(p => p.Id)
+        .Select(p => p.Id)
+        .FirstOrDefaultAsync();
+    await db.Stands
+        .AsNoTracking()
+        .OrderBy(p => p.Id)
+        .Select(p => p.Id)
+        .FirstOrDefaultAsync();
+    await db.Categories
+        .AsNoTracking()
+        .OrderBy(p => p.Id)
+        .Select(p => p.Id)
+        .FirstOrDefaultAsync();
+});
+
+
+
 app.Run();
