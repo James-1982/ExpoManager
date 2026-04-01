@@ -6,7 +6,6 @@ using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using FluentValidation.AspNetCore;
 using Expo.API.Extensions;
-using Expo.API.Middleware;
 using Expo.API.Middleware.Validations;
 using Expo.API.Utils;
 using Expo.Infrastructure.Seeders;
@@ -180,10 +179,10 @@ app.UseMiddleware<ErrorHandlerMiddleware>();
 // Security Headers
 app.Use(async (context, next) =>
 {
-    context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-    context.Response.Headers.Add("X-Frame-Options", "DENY");
-    context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-    context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     await next();
 });
 
@@ -225,7 +224,5 @@ app.Lifetime.ApplicationStarted.Register(async () =>
         .Select(p => p.Id)
         .FirstOrDefaultAsync();
 });
-
-
 
 app.Run();

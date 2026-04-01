@@ -89,13 +89,13 @@ public class CategoryController(
         {
             _service.DeleteAsync(id); // Async fire-and-forget
 
-            _logger.LogInformation("Scheduled deletion for category {CategoryId}", id);
+            Logger.LogInformation("Scheduled deletion for category {CategoryId}", id);
 
             return Accepted();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error scheduling deletion for category {CategoryId}", id);
+            Logger.LogError(ex, "Error scheduling deletion for category {CategoryId}", id);
             return Problem(ex.Message);
         }
     }
@@ -115,13 +115,17 @@ public class CategoryController(
         if (image == null)
         {
             string msg = "Empty image";
-            _logger.LogError(msg);
+            Logger.LogError(msg);
             return BadRequest(msg);
         }
 
         return await HandleImageUpload(
-        () => _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
-        "Category", id);
+            () => _service.UploadImageAsync(
+                id, 
+                image.OpenReadStream(), 
+                image.FileName, 
+                this.GetBaseUrl()),
+                "Category", id);
     }
 
     /// <summary>

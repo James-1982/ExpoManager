@@ -1,16 +1,20 @@
-﻿using FluentResults;
+﻿using Expo.API.Extensions;
+using FluentResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Expo.API.Controllers
 {
     /// <summary>
     /// Base controller with shared helpers for logging, image handling, and result mapping.
     /// </summary>
+    /// <param name="logger"></param>
     [ApiController]
     public abstract class BaseController(ILogger logger) : ControllerBase
     {
-        protected readonly ILogger _logger = logger;
+        /// <summary>
+        /// Controller log
+        /// </summary>
+        protected readonly ILogger Logger = logger;
 
         /// <summary>
         /// Map a Result&lt;T&gt; from the service to IActionResult
@@ -55,7 +59,7 @@ namespace Expo.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error uploading image for {Entity} {Id}", entityName, entityId);
+                Logger.LogError(ex, "Error uploading image for {Entity} {Id}", entityName, entityId);
                 return Problem(ex.Message);
             }
         }
@@ -81,7 +85,7 @@ namespace Expo.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting image for {Entity} {Id}", entityName, entityId);
+                Logger.LogError(ex, "Error deleting image for {Entity} {Id}", entityName, entityId);
                 return Problem(ex.Message);
             }
         }
@@ -100,7 +104,7 @@ namespace Expo.API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during {Operation}", operationDescription);
+                Logger.LogError(ex, "Error during {Operation}", operationDescription);
                 return Problem(ex.Message);
             }
         }

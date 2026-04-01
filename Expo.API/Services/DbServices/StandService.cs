@@ -1,11 +1,11 @@
-﻿using Expo.API.Extensions;
-using Expo.Application.DTO.DB;
+﻿using Expo.Application.DTO.DB;
 using Expo.Application.Interfaces.Services;
 using Expo.Domain.Entities;
 using Expo.Domain.Interfaces.Repositories;
 using FluentResults;
 using Hangfire;
 using MapsterMapper;
+using Expo.Domain.Extensions;
 
 namespace Expo.API.Services.DbServices;
 

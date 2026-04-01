@@ -23,6 +23,8 @@ public class ExhibitionAreaController(
 {
     private readonly IExhibitionAreaService _service = service;
 
+    #region CRUD
+
     /// <summary>
     /// Get all 'ExhibitionArea'
     /// </summary>
@@ -93,35 +95,47 @@ public class ExhibitionAreaController(
         return Accepted();
     }
 
+    #endregion
+
+    #region Image Endpoints
+
     /// <summary>
     /// Upload a new image for an existing 'ExhibitionArea'
     /// </summary>
     [HttpPost("{id}/image")]
+    [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UploadImage(int id, IFormFile? image)
     {
         if (image == null)
-            return BadRequest("Empty image");
+        {
+            string msg = "Empty image";
+            Logger.LogError(msg);
+            return BadRequest(msg);
+        }
 
-        return await HandleServiceCall(
-            async () => await _service.UploadImageAsync(id, image.OpenReadStream(), image.FileName, this.GetBaseUrl()),
-            $"uploading image for exhibition area {id}");
+        return await HandleImageUpload(
+            () => _service.UploadImageAsync(
+                id,
+                image.OpenReadStream(),
+                image.FileName,
+                this.GetBaseUrl()),
+                "ExhibitionArea", id);
     }
 
     /// <summary>
     /// Delete an image linked to an existing 'ExhibitionArea'
     /// </summary>
     [HttpDelete("{id}/image")]
+    [MapToApiVersion(ApiConstants.V1)]
     [Authorize(Policy = Policy.Entity.CanUpdateEntity)]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteImage(int id)
     {
-        return await HandleServiceCall(
-            async () => await _service.DeleteImageAsync(id),
-            $"deleting image for exhibition area {id}");
+        return await HandleImageDelete(
+            () => _service.DeleteImageAsync(id),
+            "ExhibitionArea",
+            id);
     }
+
+    #endregion
 }

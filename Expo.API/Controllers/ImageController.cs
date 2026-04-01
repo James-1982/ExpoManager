@@ -15,9 +15,8 @@ namespace Expo.API.Controllers;
 [ApiVersion(ApiConstants.V1)]
 public class ImageController(
     ILogger<ImageController> logger,
-    IImageService imageService) : ControllerBase
+    IImageService imageService) : BaseController(logger)
 {
-    private readonly ILogger<ImageController> _logger = logger;
     private readonly IImageService _imageService = imageService;
 
     /// <summary>
@@ -34,17 +33,17 @@ public class ImageController(
     {
         if (file == null)
         {
-            _logger.LogWarning("CheckFace called with no file uploaded.");
+            Logger.LogWarning("CheckFace called with no file uploaded.");
             return BadRequest("No file provided.");
         }
 
         try
         {
-            _logger.LogInformation($"Checking for face in uploaded file: {file.FileName}");
+            Logger.LogInformation($"Checking for face in uploaded file: {file.FileName}");
 
             var result = await _imageService.HasFaceAsync(file.OpenReadStream());
 
-            _logger.LogInformation($"Face detection result for file {file.FileName}: {result}");
+            Logger.LogInformation($"Face detection result for file {file.FileName}: {result}");
 
             return result.IsSuccess
                 ? Ok(new { faceDetected = result.Value })
@@ -52,7 +51,7 @@ public class ImageController(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Error occurred while checking face in file {file?.FileName ?? "null"}");
+            Logger.LogError(ex, $"Error occurred while checking face in file {file?.FileName ?? "null"}");
             return Problem($"An error occurred while processing the image.");
         }
     }

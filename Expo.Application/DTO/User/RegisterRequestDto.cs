@@ -1,4 +1,6 @@
-﻿namespace Expo.Application.DTO.User
+﻿using Expo.Domain.Constants;
+
+namespace Expo.Application.DTO.User
 {
     /// <summary>
     /// DTO to execute the registration of a new user
@@ -19,6 +21,6 @@
         /// <summary>
         /// Role to assign to the new user
         /// </summary>
-        public string Role { get; set; } = default!;
+        public string Role { get; set; } = RoleHierarchy.GetRoleName(Domain.Constants.Role.Supervisor)!;
     }
 }
