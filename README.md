@@ -6,7 +6,7 @@
 (from swagger => login => get token => set Bearer + token on Authorization button).
 
 # Admin Can register new user using regitration endpoint => new user will have role of Supervisor 
-  Supervisor: can to all but it can not delete entity from db (only admin can)
+  Supervisor: can do all but it can not delete entity from db (only admin can)
 
 # Admin can promote or demote any other user account
 
