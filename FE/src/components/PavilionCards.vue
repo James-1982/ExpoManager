@@ -4,18 +4,19 @@
       <CardBase
         v-for="pavilion in pavilions"
         :key="pavilion.id"
-        :item="pavilion"
-      >
+        :item="pavilion">
+        
         <template #extra>
-          <!-- Area e PoweredBy -->
-          <div class="extra-field">
-            Area: {{ pavilion.area ? pavilion.area : '-' }}
-          </div>
-          <div class="extra-field">
-            Powered By: {{ pavilion.poweredBy ? pavilion.poweredBy : '-' }}
-          </div>
-
+          <!-- Nome -->
+          <div class="fs-large">{{ pavilion.name }}</div>
+          <!-- Descrizione -->
+          <div class="fs-medium">{{ pavilion.description }}</div>
+          <!-- Area -->
+          <div class="fs-small">Area: {{ pavilion.area }}</div>
+          <!-- PoweredBy -->
+          <div class="fs-small">PoweredBy: {{ pavilion.poweredBy }}</div>
         </template>
+
       </CardBase>
     </div>
   </div>
@@ -30,13 +31,12 @@ import CardBase from './CardBase.vue';
 interface Pavilion {
   id: number;
   name: string;
-  imageUrl?: string | null;
-  numberOfStands: number;
+  description?:string;
   area?: string;
   poweredBy?: string;
+  imageUrl?: string | null;
   lastModify: string;
   modifyBy: string;
-  state?: string;
 }
 
 // Lista dei pavilion

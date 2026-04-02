@@ -6,9 +6,6 @@
       <div v-else class="placeholder-x">X</div>
     </div>
 
-    <!-- Nome -->
-    <div class="entity-name">{{ item.name }}</div>
-
     <!-- Slot extra per dettagli specifici dell'entity -->
     <slot name="extra"></slot>
 

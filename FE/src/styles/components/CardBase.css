@@ -15,6 +15,13 @@
     min-height: 100vh;
 }
 
+.cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
 .image-wrapper {
     width: 100%;
     padding-top: 100%;
@@ -51,4 +58,115 @@
     font-size: 0.7rem;
     margin-top: 0.3rem;
     text-align: center;
+}
+
+/* Stile switch globale per tutte le card */
+.card .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.card .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.card .switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 20px;
+}
+
+.card .switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.card .switch input:checked+.slider {
+    background-color: var(--accent);
+}
+
+.card .switch input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+/* opzionale: round */
+.card .switch .slider.round {
+    border-radius: 34px;
+}
+
+/* Extra row divisa in due colonne */
+.extra-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* allinea verticalmente al centro */
+    margin-top: 0.5rem;
+}
+
+/* Colonna sinistra */
+.extra-left {
+    text-align: left;
+}
+
+/* Colonna destra */
+.extra-right {
+    display: flex;
+    align-items: center;
+    /* centra verticalmente testo + switch */
+    gap: 0.5rem;
+    /* spazio tra testo e switch */
+}
+
+/* Label “Home Page” */
+.extra-label {
+    font-weight: bold;
+    color: #fff;
+    line-height: 1;
+    /* evita che testo si alzi sopra lo switch */
+}
+
+.extra-block {
+    margin-bottom: 0.4rem;
+    /* uguale a entity-name e stand-info */
+}
+
+.fs-large {
+    text-align: left;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+
+.fs-medium {
+    text-align: left;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.4rem;
+}
+
+.fs-small {
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.4rem;
 }

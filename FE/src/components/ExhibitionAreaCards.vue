@@ -7,13 +7,33 @@
         :item="exhibition"
       >
         <template #extra>
-          <!-- Stand associati -->
-          <div class="stand-info">
-            Stand associati: {{ exhibition.numberOfStands }}
-          </div>
+            <div class="extra-row extra-block">
+              <!-- Colonna sinistra vuota -->
+              <div class="extra-left"></div>
+
+              <!-- Colonna destra con Home Page + switch -->
+              <div class="extra-right">
+                <span class="extra-label">Home Page</span>
+                <label class="switch">
+                  <input type="checkbox" v-model="exhibition.highlighted" />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Nome -->
+            <div class="fs-large">{{ exhibition.name }}</div>
+            <!-- Descrizione -->
+            <div class="fs-medium">{{ exhibition.description }}</div>
+            <!-- Type -->
+            <div class="fs-small">{{ exhibition.type }}</div>
+            <!-- Stand associati -->
+            <div class="fs-small">
+              Stand associati: {{ exhibition.numberOfStands }}
+            </div>
 
           <!-- Chip stato con icona -->
-          <StateChip state="Undefined" /> 
+          <StateChip :state="exhibition.state" />
         </template>
       </CardBase>
     </div>
@@ -30,11 +50,14 @@ import StateChip from './StateChip.vue'
 interface Exhibition {
   id: number;
   name: string;
+  description?: string;
   imageUrl?: string | null;
   numberOfStands: number;
   lastModify: string;
   modifyBy: string;
+  type: string;
   state?: string;
+  highlighted:boolean
 }
 
 // Lista delle exhibitions

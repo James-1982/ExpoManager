@@ -1,0 +1,11 @@
+/* Importa prima il CSS generico della CardBase */
+@import './CardBase.css';
+
+/* Eventuale area per placeholder o immagini speciali */
+.stand-card .placeholder-x {
+    color: black;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

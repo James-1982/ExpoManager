@@ -36,7 +36,9 @@
   import { ref } from 'vue';
   import PavilionCards from './PavilionCards.vue';
   import ExhibitionAreaCards from './ExhibitionAreaCards.vue';
-  
+  import CategoryCards from './CategoryCards.vue';
+  import StandCards from './StandCards.vue';
+
   const tabs = [
     { key: 'pavilion', label: 'Padiglioni' },
     { key: 'sector', label: 'Settori' },
