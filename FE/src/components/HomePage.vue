@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import PavilionCards from './PavilionCards.vue';
 import ExhibitionAreaCards from './ExhibitionAreaCards.vue';
@@ -48,6 +48,7 @@ import api from '../api';
 
 const router = useRouter();
 const selectedTab = ref('pavilion');
+
 const tabs = [
   { key: 'pavilion', label: 'Padiglioni' },
   { key: 'sector', label: 'Settori' },
@@ -62,24 +63,32 @@ const categoryData = ref([]);
 
 const userEmail = ref(localStorage.getItem('user_email') || '');
 
-onMounted(async () => {
+// 🔥 Lazy load per tab
+watch(selectedTab, async (tab) => {
   try {
-    const [pavilionRes, exhibitionRes, standRes, categoryRes] = await Promise.all([
-      api.get('/Pavilion'),
-      api.get('/ExhibitionArea'),
-      api.get('/Stand'),
-      api.get('/Category'),
-    ]);
+    if (tab === 'pavilion' && pavilionData.value.length === 0) {
+      const res = await api.get('/Pavilion');
+      pavilionData.value = res.data;
+    }
 
-    pavilionData.value = pavilionRes.data;
-    exhibitionData.value = exhibitionRes.data;
-    standData.value = standRes.data;
-    categoryData.value = categoryRes.data;
+    if (tab === 'sector' && exhibitionData.value.length === 0) {
+      const res = await api.get('/ExhibitionArea');
+      exhibitionData.value = res.data;
+    }
 
+    if (tab === 'stand' && standData.value.length === 0) {
+      const res = await api.get('/Stand');
+      standData.value = res.data;
+    }
+
+    if (tab === 'category' && categoryData.value.length === 0) {
+      const res = await api.get('/Category');
+      categoryData.value = res.data;
+    }
   } catch (err) {
     console.error(err);
   }
-});
+}, { immediate: true }); // carica subito il primo tab
 
 const logout = async () => {
   try { await api.post('/Authentication/logout'); } 
