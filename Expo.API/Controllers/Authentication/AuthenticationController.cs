@@ -157,18 +157,15 @@ public class AuthenticationController(
     [HttpPost(AuthEndpoints.ForgotPassword)]
     [MapToApiVersion(ApiConstants.V1)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> ForgotPassword([FromBody] EmailDto model)
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
     {
         Logger.LogInformation($"Password reset requested for user: {model.Email}");
 
-        // Passa base URL senza email e token
-        var baseUrl = $"{this.GetBaseUrl()}/reset-password.html?version={this.GetApiVersionNumber()}";
-
-        var result = await _authService.ForgotPasswordAsync(model.Email, baseUrl);
+        var result = await _authService.ForgotPasswordAsync(model.Email, model.RedirectUrl);
 
         if (result.IsFailed)
         {
-            Logger.LogWarning($"Password reset failed");
+            Logger.LogWarning("Password reset failed");
             return Ok();
         }
 

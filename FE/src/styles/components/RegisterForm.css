@@ -1,0 +1,77 @@
+@import './Auth.css';
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #4f4f4f;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
+
+.register-form h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #ddd;
+    text-align: left;
+}
+
+.form-group input {
+    padding: 0.65rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    font-size: 1rem;
+    background-color: #333;
+    color: #fff;
+    outline: none;
+    transition: border 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--accent);
+}
+
+.register-form button {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: bold;
+    background: linear-gradient(135deg, #aa3bff, #6b63ff);
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.3s;
+    align-self: center;
+    width: 50%;
+}
+
+.register-form button:hover:not(:disabled) {
+    transform: scale(1.05);
+}
+
+.register-form button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.message {
+    color: #6bffb2;
+    font-size: 0.85rem;
+    text-align: center;
+}
