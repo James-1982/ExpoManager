@@ -1,3 +1,4 @@
+<!-- src/pages/WelcomePage.vue -->
 <template>
   <div class="auth-page">
     <div class="auth-container">
@@ -16,6 +17,13 @@
         <LoginForm v-if="selected === 'login'" @login-success="goHome" />
         <RegisterForm v-else />
       </div>
+
+      <!-- Link per password -->
+      <div v-if="selected === 'login'" class="auth-links">
+        <router-link to="/forgot-password">
+            Hai dimenticato la password?
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -23,8 +31,8 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import LoginForm from './LoginForm.vue';
-import RegisterForm from './RegisterForm.vue';
+import LoginForm from '../components/LoginForm.vue';
+import RegisterForm from '../components/RegisterForm.vue';
 
 const selected = ref<'login' | 'register'>('login');
 const router = useRouter();
@@ -44,4 +52,4 @@ function goHome() {
 }
 </script>
 
-<style src="../styles/components/WelcomePage.css"></style>
+<style src="../styles/components/Auth.css"></style>

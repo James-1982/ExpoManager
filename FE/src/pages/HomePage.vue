@@ -1,12 +1,12 @@
 <template>
   <div class="home-container">
     <header class="home-header">
-<div class="user-info">
-  <div class="user-box">
-    <span>{{ userEmail }}</span>
-    <button class="logout-btn" @click="logout">Logout</button>
-  </div>
-</div>
+      <div class="user-info">
+        <div class="user-box">
+          <span>{{ authStore.userEmail }}</span>
+          <button class="logout-btn" @click="logout">Logout</button>
+        </div>
+      </div>
       <h1>Expo</h1>
     </header>
 
@@ -23,14 +23,13 @@
       </div>
 
       <div class="cards-wrapper">
-        <!-- Passa i dati tramite props alle card -->
-        <PavilionCards v-show="selectedTab==='pavilion'" :pavilions="pavilionData"/>
-        <ExhibitionAreaCards v-show="selectedTab==='sector'" :exhibitions="exhibitionData"/>
-        <StandCards v-show="selectedTab==='stand'" :stands="standData"/>
-        <CategoryCards v-show="selectedTab==='category'" :categories="categoryData"/>
+        <PavilionCards v-if="selectedTab==='pavilion'" :pavilions="pavilionData" />
+        <ExhibitionAreaCards v-if="selectedTab==='sector'" :exhibitions="exhibitionData" />
+        <StandCards v-if="selectedTab==='stand'" :stands="standData" />
+        <CategoryCards v-if="selectedTab==='category'" :categories="categoryData" />
       </div>
 
-      <div v-if="selectedTab==='stand' || selectedTab==='category'" class="empty-placeholder">
+      <div v-if="(selectedTab==='stand' || selectedTab==='category') && !hasData(selectedTab)" class="empty-placeholder">
         Nessun contenuto disponibile
       </div>
     </div>
@@ -40,15 +39,18 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import PavilionCards from './PavilionCards.vue';
-import ExhibitionAreaCards from './ExhibitionAreaCards.vue';
-import StandCards from './StandCards.vue';
-import CategoryCards from './CategoryCards.vue';
+import { useAuthStore } from '../stores/authStore';
+import PavilionCards from '../components/PavilionCards.vue';
+import ExhibitionAreaCards from '../components/ExhibitionAreaCards.vue';
+import StandCards from '../components/StandCards.vue';
+import CategoryCards from '../components/CategoryCards.vue';
 import api from '../api';
 
 const router = useRouter();
-const selectedTab = ref('pavilion');
+const authStore = useAuthStore();
 
+// Tabs
+const selectedTab = ref('pavilion');
 const tabs = [
   { key: 'pavilion', label: 'Padiglioni' },
   { key: 'sector', label: 'Settori' },
@@ -56,46 +58,58 @@ const tabs = [
   { key: 'category', label: 'Categorie Merciologiche' },
 ];
 
+// Dati
 const pavilionData = ref([]);
 const exhibitionData = ref([]);
 const standData = ref([]);
 const categoryData = ref([]);
 
-const userEmail = ref(localStorage.getItem('user_email') || '');
+// Controllo se tab ha dati
+const hasData = (tab: string) => {
+  switch(tab) {
+    case 'pavilion': return pavilionData.value.length > 0;
+    case 'sector': return exhibitionData.value.length > 0;
+    case 'stand': return standData.value.length > 0;
+    case 'category': return categoryData.value.length > 0;
+    default: return false;
+  }
+};
 
-// 🔥 Lazy load per tab
-watch(selectedTab, async (tab) => {
+// Fetch dati per tab (solo se vuoto)
+const fetchTabData = async (tab: string) => {
   try {
     if (tab === 'pavilion' && pavilionData.value.length === 0) {
       const res = await api.get('/Pavilion');
       pavilionData.value = res.data;
     }
-
     if (tab === 'sector' && exhibitionData.value.length === 0) {
       const res = await api.get('/ExhibitionArea');
       exhibitionData.value = res.data;
     }
-
     if (tab === 'stand' && standData.value.length === 0) {
       const res = await api.get('/Stand');
       standData.value = res.data;
     }
-
     if (tab === 'category' && categoryData.value.length === 0) {
       const res = await api.get('/Category');
       categoryData.value = res.data;
     }
   } catch (err) {
-    console.error(err);
+    console.error('Errore fetch dati tab', err);
   }
-}, { immediate: true }); // carica subito il primo tab
+};
 
+// Watch su tab
+watch(selectedTab, (tab) => fetchTabData(tab), { immediate: true });
+
+// Logout
 const logout = async () => {
-  try { await api.post('/Authentication/logout'); } 
-  catch (err) { console.warn('Logout fallito', err); } 
-  finally {
-    localStorage.clear();
-    sessionStorage.clear();
+  try {
+    await api.post('/Authentication/logout');
+  } catch (err) {
+    console.warn('Logout fallito', err);
+  } finally {
+    authStore.clearAuth();
     router.push('/');
   }
 };

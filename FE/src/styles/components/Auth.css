@@ -1,0 +1,138 @@
+/* src/styles/components/Auth.css */
+
+/* Container principale auth-page */
+.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #2c2c2c;
+}
+
+/* Box centrale */
+.auth-container {
+    background-color: #4f4f4f;
+    padding: 2.5rem 3rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    width: 380px;
+    text-align: center;
+    color: #fff;
+}
+
+/* Titoli h1 */
+.auth-container h1 {
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+/* Form di login / register / forgot / reset */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-size: 0.9rem;
+    color: #ddd;
+    text-align: left;
+}
+
+.form-group input {
+    padding: 0.65rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    font-size: 1rem;
+    background-color: #333;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--accent);
+}
+
+/* Bottone generico auth unificato */
+.btn-auth {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #6b6375;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, opacity 0.3s;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Hover e active */
+.btn-auth:hover:not(:disabled),
+.btn-auth:active:not(:disabled) {
+    background-color: var(--accent);
+    transform: scale(1.05);
+}
+
+/* Disabled */
+.btn-auth:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Messaggi */
+.message {
+    color: #6bffb2;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/* Link per tornare al login */
+.auth-container a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.auth-container a:hover {
+    text-decoration: underline;
+}
+
+/* Wrapper form generico */
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Se hai due bottoni affiancati (login/register) */
+.auth-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.auth-buttons button {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #fff;
+    background-color: #6b6375;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.auth-buttons button.active,
+.auth-buttons button:hover {
+    background-color: var(--accent);
+    color: #fff;
+    transform: scale(1.05);
+}

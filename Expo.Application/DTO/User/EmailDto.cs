@@ -10,3 +10,9 @@ public class EmailDto
     /// </summary>
     public string Email { get; set; } = default!;
 }
+
+
+public class ForgotPasswordRequestDto : EmailDto
+{
+    public string RedirectUrl { get; set; } = default!;
+}

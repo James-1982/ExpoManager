@@ -1,55 +1,39 @@
-// src/api.ts
 import axios from 'axios';
+import { useAuthStore } from './stores/authStore';
 
-// Istanza Axios
 const api = axios.create({
   baseURL: 'https://localhost:7017/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Ottieni token valido o rinnovalo
+// --- Ottieni token valido o rinnovalo ---
 const getValidToken = async (): Promise<string | null> => {
-  let token = localStorage.getItem('token');
-  const expiration = localStorage.getItem('expiration');
-  const refreshToken = localStorage.getItem('refresh');
+  const authStore = useAuthStore();
 
-  if (!token || !expiration || new Date() >= new Date(expiration)) {
-    if (!refreshToken) {
-      localStorage.clear();
+  // Se non c'è token o è scaduto
+  if (!authStore.token || !authStore.expiration || new Date() >= new Date(authStore.expiration)) {
+    if (!authStore.refresh) {
+      authStore.clearAuth();
       window.location.href = '/';
       return null;
     }
 
     try {
-      const res = await axios.post('https://localhost:7017/api/v1/Authentication/refresh', {
-        refresh: refreshToken,
-      });
-
-      if (res.data?.token && res.data?.expiration) {
-        token = res.data.token;
-        localStorage.setItem('token', token!);
-        localStorage.setItem('expiration', res.data.expiration);
-
-        if (res.data.refresh) {
-          localStorage.setItem('refresh', res.data.refresh);
-        }
-      } else {
-        throw new Error('Refresh token response invalida');
-      }
+      await authStore.refreshToken(); // Aggiorna token ed expiration
     } catch (err) {
       console.error('Refresh token fallito', err);
-      localStorage.clear();
+      authStore.clearAuth();
       window.location.href = '/';
       return null;
     }
   }
 
-  return token;
+  return authStore.token;
 };
 
-// Interceptor request
+// --- Interceptor request ---
 api.interceptors.request.use(async (config) => {
-  // Validazione base
+  // Validazioni base
   if (config.data) {
     if ('email' in config.data && typeof config.data.email !== 'string') {
       throw new Error('Email deve essere una stringa');
@@ -59,23 +43,33 @@ api.interceptors.request.use(async (config) => {
     }
   }
 
-  // Non aggiungere token se login
-  if (config.url?.toLowerCase().includes('/authentication/login')) return config;
+  // Non aggiungere token se login o register
+  if (
+    config.url?.toLowerCase().includes('/authentication/login') ||
+    config.url?.toLowerCase().includes('/authentication/register')
+  ) {
+    return config;
+  }
 
   const token = await getValidToken();
   if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+
   return config;
 });
 
-// Interceptor response
+// --- Interceptor response ---
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const authStore = useAuthStore();
+
+    // 401 -> token scaduto o non valido
     if (error.response?.status === 401) {
       console.warn('Unauthorized: token scaduto o non valido');
-      localStorage.clear();
+      authStore.clearAuth();
       window.location.href = '/';
     }
+
     return Promise.reject(error);
   }
 );
